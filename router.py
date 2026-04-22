@@ -33,6 +33,9 @@ def route(page: ft.Page, app_view: ft.Column, route_name: str, **kwargs):
         elif route_name == "ingressos":
             from screens.ingressos import render_ingressos
             render_ingressos(page, app_view, route)
+        elif route_name == "favoritos":
+            from screens.favoritos import render_favoritos
+            render_favoritos(page, app_view, route)
             
         page.update()
     except Exception as e:

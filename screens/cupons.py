@@ -88,7 +88,7 @@ def render_cupons(page, app_view, route):
             border_radius=20,
             bgcolor="surface",
             opacity=1 if liberado else 0.5,
-            shadow=ft.BoxShadow(blur_radius=12, color=ft.Colors.BLACK12, offset=ft.Offset(0,4)),
+            shadow=ft.BoxShadow(blur_radius=12, color="black12", offset=ft.Offset(0,4)),
             content=ft.Column(
                 spacing=10,
                 controls=[
@@ -123,7 +123,7 @@ def render_cupons(page, app_view, route):
             begin=ft.Alignment(-1, -1),
             end=ft.Alignment(1, 1),
         ),
-        shadow=ft.BoxShadow(blur_radius=20, color=ft.Colors.PURPLE_200, offset=ft.Offset(0,10)),
+        shadow=ft.BoxShadow(blur_radius=20, color="purple200", offset=ft.Offset(0,10)),
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
@@ -148,7 +148,7 @@ def render_cupons(page, app_view, route):
                 ft.Container(
                     bgcolor="surface",
                     border_radius=30,
-                    shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
+                    shadow=ft.BoxShadow(blur_radius=10, color="black12"),
                     content=ft.IconButton(
                         icon=ft.Icons.ARROW_BACK,
                         icon_color="on_surface",

@@ -32,9 +32,11 @@ def main(page: ft.Page):
     # Inicialização de dados persistentes
     usuario_salvo = safe_storage_get(page, "usuario_logado")
     carrinho_salvo = safe_storage_get(page, "carrinho_data", default=[])
+    favoritos_salvos = safe_storage_get(page, "favoritos_data", default=[])
     
     setattr(page, 'usuario_logado', usuario_salvo)
     setattr(page, 'carrinho', carrinho_salvo)
+    setattr(page, 'favoritos', favoritos_salvos)
     setattr(page, 'cupons_resgatados', [])
 
     try:

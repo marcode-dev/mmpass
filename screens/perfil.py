@@ -58,7 +58,7 @@ def render_perfil(page, app_view, route):
             end=ft.Alignment(1, 1),
         ),
         width=float("inf"),
-        shadow=ft.BoxShadow(blur_radius=15, color=ft.Colors.PURPLE_200, offset=ft.Offset(0, 5)),
+        shadow=ft.BoxShadow(blur_radius=15, color="purple200", offset=ft.Offset(0, 5)),
         content=ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
@@ -103,6 +103,7 @@ def render_perfil(page, app_view, route):
                         ft.ListTile(
                             leading=ft.Icon(ft.Icons.FAVORITE),
                             title=ft.Text("Eventos Favoritos"),
+                            on_click=lambda e: route(page, app_view, "favoritos")
                         ),
                         ft.ListTile(
                             leading=ft.Icon(ft.Icons.SETTINGS),

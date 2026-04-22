@@ -125,7 +125,7 @@ def setup_chat(page, app_view, route):
         height=420,
         border_radius=25,
         visible=False,
-        shadow=ft.BoxShadow(blur_radius=25, color=ft.Colors.BLACK26),
+        shadow=ft.BoxShadow(blur_radius=25, color="black26"),
         content=ft.Column(
             spacing=0,
             controls=[
@@ -189,7 +189,7 @@ def setup_chat(page, app_view, route):
                     padding=2,
                     border_radius=50,
                     gradient=ft.LinearGradient(colors=["#93c5fd", "#818cf8"]),
-                    shadow=ft.BoxShadow(blur_radius=15, color=ft.Colors.PURPLE_200),
+                    shadow=ft.BoxShadow(blur_radius=15, color="purple200"),
                     content=ft.FloatingActionButton(
                         icon=ft.Icons.SUPPORT_AGENT,
                         bgcolor="transparent",

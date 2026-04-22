@@ -12,7 +12,7 @@ def render_carrinho(page, app_view, route):
     taxa_envio = 15.00
     desconto = 0
 
-    texto_desconto = ft.Text("", color=ft.Colors.GREEN_400, size=14)
+    texto_desconto = ft.Text("", color="green400", size=14)
 
     campo_cupom = ft.TextField(
         label="Código de cupom",
@@ -26,7 +26,7 @@ def render_carrinho(page, app_view, route):
         f"R$ {subtotal + taxa_envio:.2f}",
         size=22,
         weight="bold",
-        color=ft.Colors.ORANGE_400
+        color="orange400"
     )
 
     def aplicar_cupom(e):
@@ -43,14 +43,14 @@ def render_carrinho(page, app_view, route):
         else:
             desconto = 0
             texto_desconto.value = "❌ Cupom inválido"
-            texto_desconto.color = ft.Colors.RED_400
+            texto_desconto.color = "red400"
             page.update()
             return
 
         total = subtotal + taxa_envio - desconto
         texto_total.value = f"R$ {total:.2f}"
         texto_desconto.value = f"✅ - R$ {desconto:.2f} aplicado"
-        texto_desconto.color = ft.Colors.GREEN_400
+        texto_desconto.color = "green400"
         campo_cupom.value = ""
         page.update()
 
@@ -133,7 +133,7 @@ def render_carrinho(page, app_view, route):
             margin=ft.margin.symmetric(horizontal=15, vertical=5),
             border_radius=15,
             bgcolor="surface",
-            shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12, offset=ft.Offset(0, 2)),
+            shadow=ft.BoxShadow(blur_radius=10, color="black12", offset=ft.Offset(0, 2)),
             content=ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
@@ -178,7 +178,7 @@ def render_carrinho(page, app_view, route):
         margin=15,
         border_radius=20,
         bgcolor="surface",
-        shadow=ft.BoxShadow(blur_radius=20, color=ft.Colors.BLACK12, offset=ft.Offset(0, 5)),
+        shadow=ft.BoxShadow(blur_radius=20, color="black12", offset=ft.Offset(0, 5)),
         content=ft.Column(
             spacing=12,
             controls=[
@@ -199,8 +199,8 @@ def render_carrinho(page, app_view, route):
                             on_click=aplicar_cupom,
                             style=ft.ButtonStyle(
                                 shape=ft.RoundedRectangleBorder(radius=10),
-                                bgcolor=ft.Colors.BLUE_400,
-                                color=ft.Colors.WHITE
+                                bgcolor="blue400",
+                                color="white"
                             )
                         )
                     ]
@@ -212,9 +212,9 @@ def render_carrinho(page, app_view, route):
                     width=300,
                     height=50,
                     style=ft.ButtonStyle(
-                        bgcolor=ft.Colors.PURPLE_500,
-                        color=ft.Colors.WHITE,
-                        overlay_color=ft.Colors.WHITE24,
+                        bgcolor="purple500",
+                        color="white",
+                        overlay_color="white24",
                         shape=ft.RoundedRectangleBorder(radius=15)
                     ),
                     on_click=lambda _: route(page, app_view, "pagamento")
@@ -230,7 +230,7 @@ def render_carrinho(page, app_view, route):
                 ft.Container(
                     bgcolor="surface",
                     border_radius=30,
-                    shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
+                    shadow=ft.BoxShadow(blur_radius=10, color="black12"),
                     content=ft.IconButton(
                         icon=ft.Icons.ARROW_BACK,
                         icon_color="on_surface",
@@ -248,7 +248,7 @@ def render_carrinho(page, app_view, route):
             expand=True,
             controls=[
                 top_bar_carrinho,
-                ft.Divider(color=ft.Colors.BLACK12),
+                ft.Divider(color="black12"),
                 ft.Column(
                     expand=True,
                     scroll=ft.ScrollMode.AUTO,

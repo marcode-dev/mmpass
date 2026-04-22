@@ -22,11 +22,11 @@ def obter_total_ingressos(page):
 def cor_lotacao(percentual):
     p = float(percentual)
     if p < 50:
-        return ft.Colors.GREEN
+        return "green"
     elif p < 80:
-        return ft.Colors.ORANGE
+        return "orange"
     else:
-        return ft.Colors.RED
+        return "red"
 
 def clima_evento():
     opcoes = [
@@ -57,7 +57,7 @@ def gerar_qr(texto):
 
 def show_msg(page, text, color="white", bgcolor=None):
     if not bgcolor:
-        bgcolor = ft.Colors.GREEN_600 if "sucesso" in text.lower() or "✅" in text else ft.Colors.SURFACE_VARIANT
+        bgcolor = "green600" if "sucesso" in text.lower() or "✅" in text else "surfacevariant"
     
     page.snack_bar = ft.SnackBar(
         content=ft.Text(text, color=color),

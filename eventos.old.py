@@ -196,7 +196,7 @@ def main(page: ft.Page):
         height=420,
         border_radius=25,
         visible=False,
-        shadow=ft.BoxShadow(blur_radius=25, color=ft.Colors.BLACK26),
+        shadow=ft.BoxShadow(blur_radius=25, color="black26"),
 
         content=ft.Column(
             spacing=0,
@@ -268,7 +268,7 @@ def main(page: ft.Page):
                     padding=2,
                     border_radius=50,
                     gradient=ft.LinearGradient(colors=["#a855f7", "#7c3aed"]),
-                    shadow=ft.BoxShadow(blur_radius=15, color=ft.Colors.PURPLE_200),
+                    shadow=ft.BoxShadow(blur_radius=15, color="purple200"),
                     content=ft.FloatingActionButton(
                         content=ft.Text("🧜‍♀️", size=30),
                         bgcolor="transparent",
@@ -370,7 +370,7 @@ def main(page: ft.Page):
             shadow=ft.BoxShadow(
                 blur_radius=25,
                 spread_radius=1,
-                color=ft.Colors.BLACK26
+                color="black26"
             ),
             content=ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -497,7 +497,7 @@ def main(page: ft.Page):
             padding=30,
             border_radius=20,
             bgcolor="white",
-            shadow=ft.BoxShadow(blur_radius=25, color=ft.Colors.BLACK12),
+            shadow=ft.BoxShadow(blur_radius=25, color="black12"),
             content=ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 tight=True,
@@ -545,11 +545,11 @@ def main(page: ft.Page):
     def cor_lotacao(percentual):
         p = float(percentual)
         if p < 50:
-            return ft.Colors.GREEN
+            return "green"
         elif p < 80:
-            return ft.Colors.ORANGE
+            return "orange"
         else:
-            return ft.Colors.RED
+            return "red"
 
     # CLIMA
     def clima_evento():
@@ -676,7 +676,7 @@ def main(page: ft.Page):
             margin=ft.margin.only(left=15, right=15, top=10, bottom=10),
             padding=15,
             border_radius=20,
-            bgcolor=ft.Colors.WHITE12, 
+            bgcolor="white12", 
             blur=ft.Blur(10, 10, ft.BlurTileMode.MIRROR),
             
             content=ft.GestureDetector(
@@ -725,7 +725,7 @@ def main(page: ft.Page):
             margin=ft.margin.only(left=15, right=15, top=10, bottom=10),
             padding=15,
             border_radius=20,
-            bgcolor=ft.Colors.WHITE70, 
+            bgcolor="white70", 
             blur=ft.Blur(10, 10, ft.BlurTileMode.MIRROR),
             content=ft.GestureDetector(
                 on_tap=lambda e, ev=evento: pagina_evento(ev),
@@ -1146,12 +1146,12 @@ def main(page: ft.Page):
         taxa_envio = 15.00
         desconto = 0
 
-        texto_desconto = ft.Text("", color=ft.Colors.GREEN_400, size=14)
+        texto_desconto = ft.Text("", color="green400", size=14)
 
         campo_cupom = ft.TextField(
             label="Código de cupom",
             width=220,
-            bgcolor=ft.Colors.WHITE,
+            bgcolor="white",
             border_radius=10,
             filled=True
         )
@@ -1160,7 +1160,7 @@ def main(page: ft.Page):
             f"R$ {subtotal + taxa_envio:.2f}",
             size=22,
             weight="bold",
-            color=ft.Colors.ORANGE_400
+            color="orange400"
         )
 
         def aplicar_cupom(e):
@@ -1183,7 +1183,7 @@ def main(page: ft.Page):
             else:
                 desconto = 0
                 texto_desconto.value = "❌ Cupom inválido"
-                texto_desconto.color = ft.Colors.RED_400
+                texto_desconto.color = "red400"
                 page.update()
                 return
 
@@ -1191,7 +1191,7 @@ def main(page: ft.Page):
 
             texto_total.value = f"R$ {total:.2f}"
             texto_desconto.value = f"✅ - R$ {desconto:.2f} aplicado"
-            texto_desconto.color = ft.Colors.GREEN_400
+            texto_desconto.color = "green400"
 
             campo_cupom.value = ""
 
@@ -1204,10 +1204,10 @@ def main(page: ft.Page):
                 padding=15,
                 margin=10,
                 border_radius=20,
-                bgcolor=ft.Colors.WHITE,
+                bgcolor="white",
                 shadow=ft.BoxShadow(
                     blur_radius=15,
-                    color=ft.Colors.BLACK12,
+                    color="black12",
                     offset=ft.Offset(0, 5)
                 ),
                 content=ft.Row(
@@ -1216,12 +1216,12 @@ def main(page: ft.Page):
                         ft.Column(
                             controls=[
                                 ft.Text(evento["nome"], weight="bold", size=16),
-                                ft.Text(f'R$ {evento["preco"]}', color=ft.Colors.GREY_700),
+                                ft.Text(f'R$ {evento["preco"]}', color="grey700"),
                             ]
                         ),
                         ft.IconButton(
                             icon=ft.Icons.DELETE,
-                            icon_color=ft.Colors.RED_400,
+                            icon_color="red400",
                             tooltip="Remover",
                             on_click=lambda e, ev=evento: remover_item(ev)
                         )
@@ -1234,10 +1234,10 @@ def main(page: ft.Page):
             padding=20,
             margin=15,
             border_radius=20,
-            bgcolor=ft.Colors.WHITE,
+            bgcolor="white",
             shadow=ft.BoxShadow(
                 blur_radius=20,
-                color=ft.Colors.BLACK12,
+                color="black12",
                 offset=ft.Offset(0, 5)
             ),
             content=ft.Column(
@@ -1293,8 +1293,8 @@ def main(page: ft.Page):
                                 on_click=aplicar_cupom,
                                 style=ft.ButtonStyle(
                                     shape=ft.RoundedRectangleBorder(radius=10),
-                                    bgcolor=ft.Colors.BLUE_400,
-                                    color=ft.Colors.WHITE
+                                    bgcolor="blue400",
+                                    color="white"
                                 )
                             )
                         ]
@@ -1308,9 +1308,9 @@ def main(page: ft.Page):
                         width=300,
                         height=50,
                         style=ft.ButtonStyle(
-                            bgcolor=ft.Colors.PURPLE_500,
-                            color=ft.Colors.WHITE,
-                            overlay_color=ft.Colors.WHITE24,
+                            bgcolor="purple500",
+                            color="white",
+                            overlay_color="white24",
                             shape=ft.RoundedRectangleBorder(radius=15)
                         ),
                         on_click=lambda e: sua_funcao_de_pagamento(e, campo_cupom.value)
@@ -1343,7 +1343,7 @@ def main(page: ft.Page):
                         ]
                     ),
 
-                    ft.Divider(color=ft.Colors.WHITE24),
+                    ft.Divider(color="white24"),
 
                     *itens,
 
@@ -1397,12 +1397,12 @@ def main(page: ft.Page):
                 margin=ft.margin.only(bottom=20, left=10, right=10),
                 padding=0, 
                 border_radius=25,
-                bgcolor=ft.Colors.WHITE, 
+                bgcolor="white", 
                 clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
                 content=ft.Row(
                     spacing=0,
                     controls=[
-                        ft.Container(width=15, bgcolor=ft.Colors.PURPLE_600),
+                        ft.Container(width=15, bgcolor="purple600"),
                         
                         ft.Container(
                             padding=20,

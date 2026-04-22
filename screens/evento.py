@@ -159,7 +159,7 @@ def render_evento(page, app_view, route, evento):
                 content=ft.ElevatedButton(
                     "Adicionar ao Carrinho",
                     color="white",
-                    bgcolor=ft.Colors.TRANSPARENT,
+                    bgcolor="transparent",
                     elevation=0,
                     width=200,
                     height=50,

@@ -7,6 +7,17 @@ def render_home(page, app_view, route):
 
     eventos_todos = getattr(page, 'eventos', None) or []
     
+    # Garantir que não haja duplicatas por ID (caso o banco tenha registros repetidos)
+    vistos = set()
+    eventos_unicos = []
+    for e in eventos_todos:
+        if e["id"] not in vistos:
+            eventos_unicos.append(e)
+            vistos.add(e["id"])
+    eventos_todos = eventos_unicos
+
+    usuario_logado = getattr(page, 'usuario_logado', None)
+    
     # Se não houver eventos, mostra estado de erro com Retry
     if not eventos_todos:
         app_view.controls.append(
@@ -35,6 +46,7 @@ def render_home(page, app_view, route):
     lista_vertical = ft.Column(
         scroll=ft.ScrollMode.AUTO,
         expand=True,
+        spacing=0,
         controls=[card_evento(e, page, app_view, route, largura=None) for e in eventos_todos],
     )
 
@@ -65,43 +77,40 @@ def render_home(page, app_view, route):
         page.update()
 
     campo_busca = ft.TextField(
-        hint_text="Pesquisar festas, shows e eventos...",
+        hint_text="Encontre sua próxima experiência...",
         expand=True,
-        border_radius=30,
+        border_radius=18,
         border_color="transparent",
         filled=True,
-        bgcolor=ft.Colors.with_opacity(0.9, "surface"),
+        bgcolor="surface",
+        prefix_icon=ft.Icons.SEARCH_ROUNDED,
+        prefix_style=ft.TextStyle(color="#818cf8"),
         color="on_surface",
         on_change=lambda e: filtrar_eventos(e.control.value)
     )
 
-    search_bar = ft.Container(
-        padding=ft.padding.only(top=40, left=15, right=15, bottom=20),
+    header = ft.Container(
+        padding=ft.padding.only(top=50, left=15, right=15, bottom=25),
         gradient=ft.LinearGradient(
             colors=["#93c5fd", "#818cf8"],
             begin=ft.Alignment(-1, -1),
             end=ft.Alignment(1, 1),
         ),
-        content=ft.Row(
-            spacing=15,
-            controls=[
-                campo_busca,
-                ft.Container(
-                    bgcolor="white24",
-                    border_radius=15,
-                    content=ft.IconButton(
-                        icon=ft.Icons.SHOPPING_CART,
-                        icon_color="white",
-                        on_click=lambda e: route(page, app_view, "carrinho")
-                    )
+        border_radius=ft.BorderRadius(bottom_left=30, bottom_right=30, top_left=0, top_right=0),
+        content=ft.Row([
+            campo_busca,
+            ft.Container(
+                bgcolor="white24",
+                border_radius=12,
+                padding=2,
+                content=ft.IconButton(
+                    icon=ft.Icons.SHOPPING_CART_OUTLINED,
+                    icon_color="white",
+                    icon_size=24,
+                    on_click=lambda e: route(page, app_view, "carrinho")
                 )
-            ],
-        ),
-    )
-
-    carrossel = ft.Container(
-        height=320,
-        content=carrossel_row
+            )
+        ], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER),
     )
 
     bottom_bar = get_bottom_bar(page, app_view, route)
@@ -109,25 +118,32 @@ def render_home(page, app_view, route):
     scroll_content = ft.Column(
         expand=True,
         scroll=ft.ScrollMode.AUTO,
+        spacing=0,
         controls=[
-            search_bar,
+            header,
             ft.Container(
-                padding=ft.padding.only(left=15, bottom=5, top=20),
+                padding=ft.padding.only(left=20, bottom=5, top=25),
                 content=ft.Row([
-                    ft.Icon(ft.Icons.LOCAL_FIRE_DEPARTMENT, color="#818cf8", size=24),
-                    ft.Text("Em Alta", size=20, weight=ft.FontWeight.BOLD, color="on_surface")
-                ]),
+                    ft.Icon(ft.Icons.LOCAL_FIRE_DEPARTMENT_ROUNDED, color="#818cf8", size=24),
+                    ft.Text("Em Alta", size=20, weight="bold", color="on_surface")
+                ], spacing=8),
             ),
-            carrossel,
             ft.Container(
-                padding=ft.padding.only(left=15, top=15, bottom=5),
-                content=ft.Row([
-                    ft.Icon(ft.Icons.EVENT_AVAILABLE, color="#818cf8", size=24),
-                    ft.Text("Outros Eventos", size=20, weight=ft.FontWeight.BOLD, color="on_surface")
-                ]),
+                margin=ft.margin.only(left=10),
+                content=carrossel_row
             ),
-            lista_vertical,
-            ft.Container(height=80)
+            ft.Container(
+                padding=ft.padding.only(left=20, top=20, bottom=5),
+                content=ft.Row([
+                    ft.Icon(ft.Icons.EXPLORE_ROUNDED, color="#818cf8", size=24),
+                    ft.Text("Sugestões para você", size=20, weight="bold", color="on_surface")
+                ], spacing=8),
+            ),
+            ft.Container(
+                padding=ft.padding.only(left=10, right=10),
+                content=lista_vertical
+            ),
+            ft.Container(height=100)
         ]
     )
 

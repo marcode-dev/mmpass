@@ -41,7 +41,7 @@ def render_ingressos(page, app_view, route):
             content=ft.Row(
                 spacing=0,
                 controls=[
-                    ft.Container(width=15, bgcolor=ft.Colors.PURPLE_600),
+                    ft.Container(width=15, bgcolor="purple600"),
                     ft.Container(
                         padding=20,
                         expand=True,
@@ -100,7 +100,7 @@ def render_ingressos(page, app_view, route):
                 ft.Container(
                     bgcolor="surface",
                     border_radius=30,
-                    shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
+                    shadow=ft.BoxShadow(blur_radius=10, color="black12"),
                     content=ft.IconButton(
                         icon=ft.Icons.ARROW_BACK,
                         icon_color="on_surface",

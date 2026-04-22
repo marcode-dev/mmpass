@@ -28,7 +28,8 @@ def render_login(page, app_view, route):
             else:
                 mensagem.value = f"Email ou senha inválidos"
         except Exception as ex:
-            mensagem.value = "Erro ao conectar com servidor"
+            mensagem.value = f"Erro ao conectar com servidor"
+            print(ex)
         page.update()
 
     card_login = ft.Container(
