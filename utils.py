@@ -1,21 +1,26 @@
+"""
+Utilitários Genéricos e Funções de Auxílio.
+Agrupa métodos para gerar QRCodes, exibir mensagens (Toast), lidar com a LocalStorage e outras lógicas não atreladas à UI direta.
+"""
 import flet as ft
 import requests
 import random
 import qrcode
 import base64
 from io import BytesIO
-from api import API_MEUS_INGRESSOS
+from api import API_INGRESSOS, HEADERS
 
 def obter_total_ingressos(page):
     usuario_logado = getattr(page, 'usuario_logado', None)
     if not usuario_logado:
         return 0
     try:
-        response = requests.get(
-            f"{API_MEUS_INGRESSOS}&usuario_id={usuario_logado['id']}"
-        )
-        dados = response.json()
-        return len(dados)
+        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id"
+        response = requests.get(url, headers=HEADERS, timeout=10)
+        if response.status_code == 200:
+            dados = response.json()
+            return len(dados)
+        return 0
     except:
         return 0
 

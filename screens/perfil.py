@@ -1,3 +1,7 @@
+"""
+Tela de Perfil.
+Painel de controle do usuário, com atalhos para carteira de bilhetes, suporte por chat, favoritos e deslogar.
+"""
 import flet as ft
 from shared_ui import get_bottom_bar
 from chat import update_chat_visibility

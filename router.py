@@ -1,3 +1,7 @@
+"""
+Roteador Principal (Router).
+Controla a navegação dinâmica entre as diferentes Views (Telas) da arquitetura modular do aplicativo.
+"""
 import flet as ft
 import traceback
 

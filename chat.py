@@ -1,3 +1,7 @@
+"""
+Módulo do Chatbot de Inteligência Artificial para suporte ao usuário.
+Gerencia a UI do chat flutuante, histórico de conversas e integração com o modelo generativo Gemini.
+"""
 import flet as ft
 
 def update_chat_visibility(page):

@@ -1,6 +1,9 @@
+"""
+Ponto de entrada principal da aplicação (App Entrypoint).
+Inicializa a janela do Flet, gerencia a hidratação de sessão persistente e invoca o roteador raiz.
+"""
 import flet as ft
 import requests
-from api import API_URL
 from router import route
 from chat import setup_chat
 from utils import safe_storage_get
@@ -40,9 +43,14 @@ def main(page: ft.Page):
     setattr(page, 'cupons_resgatados', [])
 
     try:
-        response = requests.get(API_URL, timeout=10)
-        eventos_data = response.json()
-        setattr(page, 'eventos', eventos_data)
+        from api import API_EVENTOS, HEADERS
+        response = requests.get(f"{API_EVENTOS}?select=*", headers=HEADERS, timeout=10)
+        if response.status_code == 200:
+            eventos_data = response.json()
+            setattr(page, 'eventos', eventos_data)
+        else:
+            print(f"Erro da API Supabase: {response.text}")
+            setattr(page, 'eventos', [])
     except Exception as e:
         print(f"Erro ao carregar eventos: {e}")
         setattr(page, 'eventos', [])

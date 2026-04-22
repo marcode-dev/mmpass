@@ -1,3 +1,7 @@
+"""
+Componentes de UI Compartilhados.
+Contém barras de navegação (BottomBar/TopBar), animações globais e estilos universais para manter a consistência visual.
+"""
 import flet as ft
 
 def get_bottom_bar(page, app_view, route):
@@ -47,13 +51,35 @@ def card_evento(evento, page, app_view, route, largura=250):
 
     def toggle_favorito(e):
         from utils import safe_storage_set
+        import requests
+        from api import API_FAVORITOS, HEADERS
+        import threading
+        
         favs = getattr(page, 'favoritos', [])
+        usuario = getattr(page, 'usuario_logado', None)
+        
         if evento_id in favs:
             favs.remove(evento_id)
             e.control.content.color = "white"
+            
+            # Sync com banco
+            if usuario:
+                def remove_db():
+                    try:
+                        requests.delete(f"{API_FAVORITOS}?usuario_id=eq.{usuario['id']}&evento_id=eq.{evento_id}", headers=HEADERS, timeout=5)
+                    except: pass
+                threading.Thread(target=remove_db).start()
         else:
             favs.append(evento_id)
             e.control.content.color = "#818cf8"
+            
+            # Sync com banco
+            if usuario:
+                def add_db():
+                    try:
+                        requests.post(API_FAVORITOS, json={"usuario_id": usuario['id'], "evento_id": evento_id}, headers=HEADERS, timeout=5)
+                    except: pass
+                threading.Thread(target=add_db).start()
         
         setattr(page, 'favoritos', favs)
         safe_storage_set(page, "favoritos_data", favs)
@@ -134,7 +160,7 @@ def card_evento(evento, page, app_view, route, largura=250):
                             controls=[
                                 ft.Row([
                                     ft.Text("R$ ", size=12, color="#818cf8", weight="bold"),
-                                    ft.Text(f'{evento["preco"]}', weight="bold", size=18, color="on_surface"),
+                                    ft.Text(f'{float(evento["preco"]):.2f}'.replace('.', ','), weight="bold", size=18, color="on_surface"),
                                 ], spacing=0),
                                 ft.Container(
                                     padding=ft.padding.symmetric(horizontal=10, vertical=5),

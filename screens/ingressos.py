@@ -1,6 +1,10 @@
+"""
+Tela de Meus Ingressos.
+Realiza junção no Supabase (eventos + ingressos) e gera o QR Code visual para entrada na festa.
+"""
 import flet as ft
 import requests
-from api import API_MEUS_INGRESSOS
+from api import API_INGRESSOS, HEADERS
 from utils import gerar_qr
 
 def render_ingressos(page, app_view, route):
@@ -13,9 +17,27 @@ def render_ingressos(page, app_view, route):
         return
 
     try:
-        response = requests.get(f"{API_MEUS_INGRESSOS}&usuario_id={usuario_logado['id']}")
-        ingressos = response.json() if response.status_code == 200 else []
-    except:
+        # Busca no Supabase puxando dados da tabela relacional "eventos"
+        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id,data_compra,eventos(*)"
+        response = requests.get(url, headers=HEADERS, timeout=10)
+        
+        if response.status_code == 200:
+            raw_ingressos = response.json()
+            # Mapeamos para o formato antigo para não quebrar a UI
+            ingressos = []
+            for item in raw_ingressos:
+                if item.get("eventos"):
+                    ev = item["eventos"]
+                    ingressos.append({
+                        "ingresso_id": item["id"],
+                        "nome": ev["nome"],
+                        "data": ev["data"],
+                        "local": ev["local"]
+                    })
+        else:
+            ingressos = []
+    except Exception as e:
+        print(f"Erro ao buscar ingressos: {e}")
         ingressos = []
 
     lista_cards = []

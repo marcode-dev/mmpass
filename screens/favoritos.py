@@ -1,3 +1,7 @@
+"""
+Tela de Eventos Favoritos.
+Consulta os IDs favoritados localmente e renderiza a lista a partir do servidor.
+"""
 import flet as ft
 from shared_ui import get_bottom_bar, card_evento
 

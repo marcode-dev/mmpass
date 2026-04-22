@@ -1,3 +1,7 @@
+"""
+Tela de Cupons e Programa de Fidelidade.
+Oferece roleta diária e sistema de resgate de descontos.
+"""
 import flet as ft
 from utils import nivel_usuario, obter_total_ingressos
 

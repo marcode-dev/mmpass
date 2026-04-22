@@ -1,3 +1,7 @@
+"""
+Tela Principal (Home).
+Lista eventos em destaque, sistema de busca iterativo e filtragem de categorias de festas consultando do Supabase.
+"""
 import flet as ft
 from shared_ui import get_bottom_bar, card_evento
 
@@ -6,17 +10,6 @@ def render_home(page, app_view, route):
     app_view.expand = True
 
     eventos_todos = getattr(page, 'eventos', None) or []
-    
-    # Garantir que não haja duplicatas por ID (caso o banco tenha registros repetidos)
-    vistos = set()
-    eventos_unicos = []
-    for e in eventos_todos:
-        if e["id"] not in vistos:
-            eventos_unicos.append(e)
-            vistos.add(e["id"])
-    eventos_todos = eventos_unicos
-
-    usuario_logado = getattr(page, 'usuario_logado', None)
     
     # Se não houver eventos, mostra estado de erro com Retry
     if not eventos_todos:

@@ -1,6 +1,10 @@
+"""
+Tela de Pagamento e Checkout de Carrinho.
+Orquestra o registro atômico de compra: confere lotação, deduz cupons, adiciona ingressos e incrementa as vendas num único fluxo.
+"""
 import flet as ft
 import requests
-from api import API_URL_COMPRAR
+from api import API_EVENTOS, API_INGRESSOS, HEADERS
 from utils import show_msg, gerar_qr, safe_storage_set
 
 def render_pagamento(page, app_view, route):
@@ -13,7 +17,8 @@ def render_pagamento(page, app_view, route):
 
     subtotal = sum(float(ev["preco"]) for ev in carrinho)
     taxa = 15.00
-    total_geral = subtotal + taxa
+    desconto = getattr(page, 'desconto_aplicado', 0)
+    total_geral = subtotal + taxa - desconto
 
     # Estado local da tela
     metodo_atual = "pix" # Padrão
@@ -28,41 +33,34 @@ def render_pagamento(page, app_view, route):
         page.update()
 
     def animacao_sucesso():
+        def fechar_sucesso(e):
+            dialog.open = False
+            page.update()
+            route(page, app_view, "ingressos")
+            
         dialog = ft.AlertDialog(
             modal=True,
             content=ft.Container(
-                width=320,
-                height=350,
+                width=300,
                 padding=20,
-                border_radius=25,
-                bgcolor="surface",
-                content=ft.Column(
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    controls=[
-                        ft.Container(
-                            width=100, height=100,
-                            bgcolor="#f0fdf4",
-                            border_radius=50,
-                            alignment=ft.Alignment(0,0),
-                            content=ft.Icon(ft.Icons.CHECK_CIRCLE_ROUNDED, color="green", size=60)
-                        ),
-                        ft.Container(height=10),
-                        ft.Text("Pagamento Confirmado!", size=22, weight="bold", color="on_surface"),
-                        ft.Text("Seus ingressos digitais já foram gerados.", text_align="center", color="on_surface_variant"),
-                        ft.Container(height=20),
-                        ft.ElevatedButton(
-                            "Acessar Meus Ingressos",
-                            width=240,
-                            height=50,
-                            style=ft.ButtonStyle(bgcolor="#818cf8", color="white", shape=ft.RoundedRectangleBorder(radius=12)),
-                            on_click=lambda _: (fechar_dialogo(dialog), route(page, app_view, "ingressos"))
-                        )
-                    ]
-                )
+                content=ft.Column([
+                    ft.Icon(ft.Icons.CHECK_CIRCLE_OUTLINE_ROUNDED, color="green", size=80),
+                    ft.Text("Pagamento Aprovado!", size=22, weight="bold", color="on_surface", text_align="center"),
+                    ft.Text("Seus ingressos já estão disponíveis na aba Perfil.", size=14, color="on_surface_variant", text_align="center"),
+                    ft.Container(height=10),
+                    ft.ElevatedButton(
+                        "Ver Ingressos",
+                        bgcolor="green600",
+                        color="white",
+                        width=float("inf"),
+                        on_click=fechar_sucesso
+                    )
+                ], tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
             )
         )
-        abrir_dialogo(dialog)
+        page.overlay.append(dialog)
+        dialog.open = True
+        page.update()
 
     def processar_pagamento(e):
         if not usuario_logado:
@@ -76,25 +74,49 @@ def render_pagamento(page, app_view, route):
         sucesso_total = True
         for evento in carrinho:
             try:
-                dados = {
-                    "action": "comprar",
+                # 1. Verificar lotação
+                resp_evento = requests.get(f"{API_EVENTOS}?id=eq.{evento['id']}&select=capacidade,ingressos_vendidos", headers=HEADERS, timeout=10)
+                if resp_evento.status_code != 200 or not resp_evento.json():
+                    sucesso_total = False
+                    continue
+                
+                dados_ev = resp_evento.json()[0]
+                if dados_ev['ingressos_vendidos'] >= dados_ev['capacidade']:
+                    sucesso_total = False # Evento lotado
+                    continue
+
+                # 2. Registrar Ingresso
+                novo_ingresso = {
                     "usuario_id": usuario_logado["id"],
                     "evento_id": evento["id"]
                 }
-                response = requests.post(API_URL_COMPRAR, json=dados, timeout=10)
-                if response.json().get("status") != "sucesso":
+                resp_ing = requests.post(API_INGRESSOS, headers=HEADERS, json=novo_ingresso, timeout=10)
+                
+                # O status de criação é 201 no Supabase PostgREST
+                if resp_ing.status_code not in (200, 201):
                     sucesso_total = False
-            except:
+                    continue
+
+                # 3. Atualizar (PATCH) ingressos vendidos
+                novos_vendidos = dados_ev['ingressos_vendidos'] + 1
+                resp_patch = requests.patch(f"{API_EVENTOS}?id=eq.{evento['id']}", headers=HEADERS, json={"ingressos_vendidos": novos_vendidos}, timeout=10)
+                
+                if resp_patch.status_code not in (200, 204):
+                    sucesso_total = False
+
+            except Exception as ex:
+                print(f"Erro no pagamento: {ex}")
                 sucesso_total = False
         
         if sucesso_total:
             carrinho.clear()
             safe_storage_set(page, "carrinho_data", [])
+            setattr(page, 'desconto_aplicado', 0)
             animacao_sucesso()
         else:
-            show_msg(page, "Falha no processamento. Verifique seus dados.", bgcolor="red")
+            show_msg(page, "Falha no processamento. Reinicie seu carrinho e tente de novo.", bgcolor="red")
             btn_pagar.disabled = False
-            btn_pagar.content = ft.Text("Tentar Novamente", weight="bold")
+            btn_pagar.content = ft.Text("Tentar Novamente", weight="bold", color="white")
             page.update()
 
     # UI do Pix
@@ -139,13 +161,13 @@ def render_pagamento(page, app_view, route):
                 border_radius=20,
                 gradient=ft.LinearGradient(
                     colors=["#1e293b", "#334155"],
-                    begin=ft.Alignment(-1, -1),
-                    end=ft.Alignment(1, 1)
+                    begin=ft.Alignment(-1, -1), end=ft.Alignment(1, 1)
                 ),
-                padding=25,
+                padding=20,
+                shadow=ft.BoxShadow(blur_radius=20, color="black26", offset=ft.Offset(0, 10)),
                 content=ft.Column([
                     ft.Row([
-                        ft.Icon(ft.Icons.CREDIT_CARD_ROUNDED, color="white60", size=30),
+                        ft.Icon(ft.Icons.CREDIT_CARD_ROUNDED, color="white70", size=30),
                         ft.Text("MMPass Gold", color="white60", size=12)
                     ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                     ft.Container(height=20),
@@ -153,13 +175,13 @@ def render_pagamento(page, app_view, route):
                     ft.Container(height=10),
                     ft.Row([
                         ft.Column([
-                            ft.Text("TITULAR", color="white60", size=10),
-                            ft.Text(usuario_logado['nome'].upper() if usuario_logado else "NOME DO TITULAR", color="white", size=14)
+                            ft.Text("TITULAR", color="white54", size=10),
+                            ft.Text(usuario_logado["nome"].upper() if usuario_logado else "NOME DO TITULAR", color="white", size=14, weight="bold")
                         ]),
                         ft.Column([
-                            ft.Text("VALIDADE", color="white60", size=10),
-                            ft.Text("••/••", color="white", size=14)
-                        ], horizontal_alignment=ft.CrossAxisAlignment.END)
+                            ft.Text("VALIDADE", color="white54", size=10),
+                            ft.Text("12/29", color="white", size=14, weight="bold")
+                        ])
                     ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
                 ])
             ),
@@ -260,12 +282,12 @@ def render_pagamento(page, app_view, route):
                                 content=ft.Column([
                                     ft.Row([
                                         ft.Text("Total da Compra", size=14, color="on_surface_variant"),
-                                        ft.Text(f"R$ {total_geral:.2f}", size=24, weight="bold", color="#818cf8")
+                                        ft.Text(f"R$ {total_geral:.2f}".replace('.', ','), size=24, weight="bold", color="#818cf8")
                                     ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                                     ft.Divider(height=30, color="outline_variant", thickness=0.5),
                                     ft.Row([
                                         ft.Text(f"{len(carrinho)} ingressos", size=14, color="on_surface_variant"),
-                                        ft.Text(f"Taxa de serviço: R$ {taxa:.2f}", size=12, color="on_surface_variant")
+                                        ft.Text(f"Taxa de serviço: R$ {taxa:.2f}".replace('.', ','), size=12, color="on_surface_variant")
                                     ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
                                 ])
                             ),

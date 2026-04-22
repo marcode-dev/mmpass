@@ -1,6 +1,9 @@
+"""
+Tela do Carrinho de Compras.
+Lista eventos selecionados, calcula subtotal com desconto de cupons e direciona para o pagamento.
+"""
 import flet as ft
 import requests
-from api import API_URL_COMPRAR
 from utils import safe_storage_set
 
 def render_carrinho(page, app_view, route):
@@ -95,36 +98,11 @@ def render_carrinho(page, app_view, route):
         dialog.open = True
         page.update()
 
-    def sua_funcao_de_pagamento(e, cupom):
-        if not usuario_logado:
-            page.snack_bar = ft.SnackBar(ft.Text("Atenção: Faça login para finalizar a compra"))
-            page.snack_bar.open = True
-            page.update()
-            return
 
-        if not carrinho:
-            page.snack_bar = ft.SnackBar(ft.Text("Carrinho vazio"))
-            page.snack_bar.open = True
-            page.update()
-            return
-            
-        for evento in carrinho:
-            dados = {
-                "action": "comprar",
-                "usuario_id": usuario_logado["id"],
-                "evento_id": evento["id"]
-            }
-            response = requests.post(API_URL_COMPRAR, json=dados)
-            try:
-                resultado = response.json()
-                if resultado.get("status") != "sucesso":
-                    print("Erro ao comprar:", resultado)
-            except:
-                print("Erro na resposta da API")
 
-        carrinho.clear()
-        setattr(page, 'carrinho', carrinho)
-        animacao_compra()
+    def finalizar_compra(e):
+        setattr(page, 'desconto_aplicado', desconto)
+        route(page, app_view, "pagamento")
 
     itens = []
     for evento in carrinho:
@@ -156,7 +134,7 @@ def render_carrinho(page, app_view, route):
                                 spacing=2,
                                 controls=[
                                     ft.Text(evento["nome"], weight="bold", size=15, color="on_surface", max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
-                                    ft.Text(f'R$ {evento["preco"]}', color="#818cf8", weight="bold", size=14),
+                                    ft.Text(f'R$ {float(evento["preco"]):.2f}'.replace('.', ','), color="#818cf8", weight="bold", size=14),
                                 ]
                             ),
                         ], spacing=15)
@@ -183,8 +161,8 @@ def render_carrinho(page, app_view, route):
             spacing=12,
             controls=[
                 ft.Text("Resumo do Pedido", size=20, weight="bold"),
-                ft.Row([ft.Text("Subtotal"), ft.Text(f"R$ {subtotal:.2f}")], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                ft.Row([ft.Text("Taxa de envio"), ft.Text(f"R$ {taxa_envio:.2f}")], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                ft.Row([ft.Text("Subtotal"), ft.Text(f"R$ {subtotal:.2f}".replace('.', ','))], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                ft.Row([ft.Text("Taxa de envio"), ft.Text(f"R$ {taxa_envio:.2f}".replace('.', ','))], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Row([ft.Text("Desconto"), texto_desconto], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 ft.Row([ft.Text("Total Geral", weight="bold"), texto_total], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
@@ -217,7 +195,7 @@ def render_carrinho(page, app_view, route):
                         overlay_color="white24",
                         shape=ft.RoundedRectangleBorder(radius=15)
                     ),
-                    on_click=lambda _: route(page, app_view, "pagamento")
+                    on_click=finalizar_compra
                 )
             ]
         )

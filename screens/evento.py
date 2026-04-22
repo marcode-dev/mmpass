@@ -1,3 +1,7 @@
+"""
+Tela de Detalhes do Evento.
+Exibe imagens heroicas, dados da festa, capacidade restante e botões para favoritar ou comprar.
+"""
 import flet as ft
 from utils import cor_lotacao, clima_evento, show_msg, safe_storage_set
 
@@ -6,8 +10,15 @@ def render_evento(page, app_view, route, evento):
         route(page, app_view, "home")
         return
 
-    lotacao_percent = float(evento["lotacao_percentual"])
-    lotacao_valor = lotacao_percent / 100
+    capacidade = evento.get("capacidade", 1)
+    ingressos_vendidos = evento.get("ingressos_vendidos", 0)
+    
+    # Previne divisão por zero
+    if capacidade <= 0:
+        capacidade = 1
+        
+    lotacao_percent = (ingressos_vendidos / capacidade) * 100
+    lotacao_valor = ingressos_vendidos / capacidade
     cor = cor_lotacao(lotacao_percent)
     clima = clima_evento()
 
@@ -118,7 +129,7 @@ def render_evento(page, app_view, route, evento):
                     content=ft.Column([
                         ft.Row([
                             ft.Text("Disponibilidade", weight="bold"),
-                            ft.Text(f"{evento['lotacao_percentual']}%", color=cor, weight="bold"),
+                            ft.Text(f"{lotacao_percent:.0f}%", color=cor, weight="bold"),
                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                         ft.ProgressBar(value=lotacao_valor, color=cor, bgcolor="outline_variant", height=8),
                         ft.Text("Garanta o seu antes que esgote!", size=12, color="on_surface_variant"),

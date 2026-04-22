@@ -1,12 +1,13 @@
 import flet as ft
 import requests
-from api import CADASTRO_API
+import bcrypt
+from api import API_USUARIOS, HEADERS
 
 def render_cadastro(page, app_view, route):
     # Inputs com estilo moderno
     nome = ft.TextField(
         label="Nome Completo",
-        hint_text="Como você quer ser chamado?",
+        hint_text="Seu nome",
         border_radius=15,
         border_color="transparent",
         filled=True,
@@ -45,27 +46,42 @@ def render_cadastro(page, app_view, route):
     mensagem = ft.Text("", color="red", size=12)
 
     def cadastrar(e):
+        from utils import show_msg
+        
         if not nome.value or not email.value or not senha.value:
             mensagem.value = "Preencha todos os campos"
             page.update()
             return
 
-        dados = {"nome": nome.value, "email": email.value, "senha": senha.value}
+        # Hash da senha usando bcrypt (encoding para bytes, dps decodando pra string pra salvar)
+        senha_hash = bcrypt.hashpw(senha.value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        dados = {
+            "nome": nome.value, 
+            "email": email.value, 
+            "senha": senha_hash
+        }
+        
         btn_cadastrar.disabled = True
         btn_cadastrar.content = ft.ProgressRing(width=20, height=20, color="white", stroke_width=2)
         page.update()
 
         try:
-            response = requests.post(CADASTRO_API, json=dados, timeout=10)
-            resultado = response.json()
-            if resultado.get("status") == "sucesso":
+            # Para Supabase (PostgREST), uma chamada POST insere os dados
+            # E Prefer: return=representation nos devolve a row inserida
+            response = requests.post(API_USUARIOS, headers=HEADERS, json=dados, timeout=10)
+            
+            if response.status_code in (200, 201):
                 show_msg(page, "Conta criada! 🎉 Faça login agora.", bgcolor="green600")
                 route(page, app_view, "login")
                 return
             else:
-                mensagem.value = resultado.get("mensagem") or "Erro ao criar conta"
-        except:
-            mensagem.value = "Erro de conexão com o servidor"
+                erro_json = response.json()
+                # O Supabase retorna detalhes no campo 'message' ou 'details'
+                mensagem.value = f"Erro: {erro_json.get('message', 'Erro ao criar conta no banco')}"
+        except Exception as ex:
+            mensagem.value = f"Erro de conexão com o servidor"
+            print(ex)
         
         btn_cadastrar.disabled = False
         btn_cadastrar.content = ft.Text("Criar Conta", weight="bold", color="white")
