@@ -3,6 +3,7 @@ import requests
 from api import API_URL
 from router import route
 from chat import setup_chat
+from utils import safe_storage_get
 
 def main(page: ft.Page):
     page.title = "MMPass"
@@ -10,11 +11,12 @@ def main(page: ft.Page):
     page.spacing = 0
     page.window_full_screen = False
     page.theme_mode = ft.ThemeMode.LIGHT
+    page.theme = ft.Theme(color_scheme_seed="#818cf8")
+    page.dark_theme = ft.Theme(color_scheme_seed="#818cf8")
     page.assets_dir = "assets"
 
     fundo_mestre = ft.Container(
         expand=True,
-        bgcolor="#F8FAFC",
     )
 
     app_view = ft.Column(
@@ -27,19 +29,30 @@ def main(page: ft.Page):
     fundo_mestre.content = app_view
     page.add(fundo_mestre)
 
-    try:
-        eventos_data = requests.get(API_URL).json()
-        setattr(page, 'eventos', eventos_data)
-    except:
-        setattr(page, 'eventos', [])
-
-    setattr(page, 'usuario_logado', None)
-    setattr(page, 'carrinho', [])
+    # Inicialização de dados persistentes
+    usuario_salvo = safe_storage_get(page, "usuario_logado")
+    carrinho_salvo = safe_storage_get(page, "carrinho_data", default=[])
+    
+    setattr(page, 'usuario_logado', usuario_salvo)
+    setattr(page, 'carrinho', carrinho_salvo)
     setattr(page, 'cupons_resgatados', [])
+
+    try:
+        response = requests.get(API_URL, timeout=10)
+        eventos_data = response.json()
+        setattr(page, 'eventos', eventos_data)
+    except Exception as e:
+        print(f"Erro ao carregar eventos: {e}")
+        setattr(page, 'eventos', [])
+        # Futuro: Adicionar botão de "Tentar Novamente" na Home
     
     setup_chat(page, app_view, route)
 
-    route(page, app_view, "login")
+    # Redirecionamento Inteligente
+    if usuario_salvo:
+        route(page, app_view, "home")
+    else:
+        route(page, app_view, "login")
 
 if __name__ == "__main__":
     ft.app(target=main)

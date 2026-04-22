@@ -54,3 +54,44 @@ def gerar_qr(texto):
     qr.save(buffer, format="PNG")
     img_str = base64.b64encode(buffer.getvalue()).decode()
     return f"data:image/png;base64,{img_str}"
+
+def show_msg(page, text, color="white", bgcolor=None):
+    if not bgcolor:
+        bgcolor = ft.Colors.GREEN_600 if "sucesso" in text.lower() or "✅" in text else ft.Colors.SURFACE_VARIANT
+    
+    page.snack_bar = ft.SnackBar(
+        content=ft.Text(text, color=color),
+        bgcolor=bgcolor,
+        action="Ok"
+    )
+    page.snack_bar.open = True
+    page.update()
+
+# --- Funções de Storage Seguro ---
+
+def safe_storage_get(page, key, default=None):
+    try:
+        if hasattr(page, "client_storage") and page.client_storage:
+            val = page.client_storage.get(key)
+            return val if val is not None else default
+    except Exception as e:
+        print(f"Erro ao ler storage: {e}")
+    return default
+
+def safe_storage_set(page, key, value):
+    try:
+        if hasattr(page, "client_storage") and page.client_storage:
+            page.client_storage.set(key, value)
+            return True
+    except Exception as e:
+        print(f"Erro ao salvar no storage: {e}")
+    return False
+
+def safe_storage_remove(page, key):
+    try:
+        if hasattr(page, "client_storage") and page.client_storage:
+            page.client_storage.remove(key)
+            return True
+    except Exception as e:
+        print(f"Erro ao remover do storage: {e}")
+    return False

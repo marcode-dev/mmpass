@@ -20,15 +20,15 @@ def render_cupons(page, app_view, route):
                 width=320,
                 height=400,
                 padding=20,
-                bgcolor="white",
+                bgcolor="surface",
                 border_radius=25,
                 content=ft.Column(
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         ft.Icon(ft.Icons.REDEEM, size=70, color="#FF9D00"),
-                        ft.Text("Cupom Resgatado!", size=22, weight="bold"),
-                        ft.Text("Use o código abaixo na compra:", color="black54", text_align="center"),
+                        ft.Text("Cupom Resgatado!", size=22, weight="bold", color="on_surface"),
+                        ft.Text("Use o código abaixo na compra:", color="on_surface_variant", text_align="center"),
                         ft.Container(
                             bgcolor="#FFF5F0",
                             padding=15,
@@ -39,8 +39,8 @@ def render_cupons(page, app_view, route):
                             content=ft.Text("Fechar"), 
                             on_click=fechar_dialog,
                             width=200,
-                            bgcolor="black",
-                            color="white"
+                            bgcolor="primary",
+                            color="on_primary"
                         )
                     ]
                 )
@@ -86,9 +86,9 @@ def render_cupons(page, app_view, route):
             margin=15,
             width=320,
             border_radius=20,
-            bgcolor="white",
+            bgcolor="surface",
             opacity=1 if liberado else 0.5,
-            shadow=ft.BoxShadow(blur_radius=12, color="black12", offset=ft.Offset(0,4)),
+            shadow=ft.BoxShadow(blur_radius=12, color=ft.Colors.BLACK12, offset=ft.Offset(0,4)),
             content=ft.Column(
                 spacing=10,
                 controls=[
@@ -99,8 +99,8 @@ def render_cupons(page, app_view, route):
                             ft.Icon(ft.Icons.LOCAL_OFFER, color="#8ca6db")
                         ]
                     ),
-                    ft.Text(cupom["desc"], size=15, color="black87"),
-                    ft.Text(f"Nível necessário: {cupom['nivel']}", size=13, color="black54"),
+                    ft.Text(cupom["desc"], size=15, color="on_surface"),
+                    ft.Text(f"Nível necessário: {cupom['nivel']}", size=13, color="on_surface_variant"),
                     ft.Container(height=5),
                     ft.Button(
                         "Resgatar" if liberado else "Bloqueado",
@@ -146,17 +146,17 @@ def render_cupons(page, app_view, route):
         content=ft.Row(
             controls=[
                 ft.Container(
-                    bgcolor="white",
+                    bgcolor="surface",
                     border_radius=30,
                     shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
                     content=ft.IconButton(
                         icon=ft.Icons.ARROW_BACK,
-                        icon_color="black",
+                        icon_color="on_surface",
                         on_click=lambda e: route(page, app_view, "home")
                     )
                 ),
                 ft.Container(width=15),
-                ft.Text("Fidelidade", size=26, weight=ft.FontWeight.BOLD, color="black", expand=True),
+                ft.Text("Fidelidade", size=26, weight=ft.FontWeight.BOLD, color="on_surface", expand=True),
             ]
         )
     )

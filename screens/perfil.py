@@ -1,6 +1,7 @@
 import flet as ft
 from shared_ui import get_bottom_bar
 from chat import update_chat_visibility
+from utils import safe_storage_remove
 
 def render_perfil(page, app_view, route):
     usuario_logado = getattr(page, 'usuario_logado', None)
@@ -10,6 +11,10 @@ def render_perfil(page, app_view, route):
         return
 
     def logout(e):
+        # Limpar armazenamento persistente
+        safe_storage_remove(page, "usuario_logado")
+        safe_storage_remove(page, "carrinho_data")
+        
         setattr(page, 'usuario_logado', None)
         setattr(page, 'carrinho', [])
         setattr(page, 'cupons_resgatados', [])
@@ -30,7 +35,12 @@ def render_perfil(page, app_view, route):
             title=ft.Text("Configurações"),
             content=ft.Column(
                 [
-                    ft.Button("Alternar tema", icon=ft.Icons.BRIGHTNESS_4, on_click=mudar_tema),
+                    ft.ElevatedButton(
+                        "Alternar tema", 
+                        icon=ft.Icons.BRIGHTNESS_4, 
+                        on_click=mudar_tema,
+                        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10))
+                    ),
                     ft.TextButton("Fechar", on_click=fechar_dialogo)
                 ],
                 tight=True,
@@ -54,7 +64,7 @@ def render_perfil(page, app_view, route):
             controls=[
                 ft.CircleAvatar(
                     radius=55,
-                    bgcolor="white",
+                    bgcolor="surface",
                     content=ft.Text(
                         usuario_logado["nome"][0].upper(),
                         size=40,
@@ -81,7 +91,7 @@ def render_perfil(page, app_view, route):
                 width=320,
                 padding=20,
                 border_radius=20,
-                bgcolor="white",
+                bgcolor="surface",
                 content=ft.Column(
                     spacing=15,
                     controls=[

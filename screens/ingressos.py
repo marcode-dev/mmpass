@@ -23,7 +23,7 @@ def render_ingressos(page, app_view, route):
     if not ingressos:
         lista_cards.append(
             ft.Container(
-                content=ft.Text("Você ainda não possui ingressos.", size=18, color="black54"),
+                content=ft.Text("Você ainda não possui ingressos.", size=18, color="on_surface_variant"),
                 margin=ft.margin.only(top=50),
                 alignment=ft.Alignment(0, 0) 
             )
@@ -36,7 +36,7 @@ def render_ingressos(page, app_view, route):
             margin=ft.margin.only(bottom=20, left=10, right=10),
             padding=0, 
             border_radius=25,
-            bgcolor=ft.Colors.WHITE, 
+            bgcolor="surface", 
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
             content=ft.Row(
                 spacing=0,
@@ -53,25 +53,25 @@ def render_ingressos(page, app_view, route):
                                     ingresso["nome"].upper(),
                                     size=20,
                                     weight=ft.FontWeight.BOLD,
-                                    color="black",
+                                    color="on_surface",
                                     text_align=ft.TextAlign.CENTER
                                 ),
-                                ft.Divider(height=1, color="black12"),
+                                ft.Divider(height=1, color="outline_variant"),
                                 ft.Row(
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     controls=[
-                                        ft.Icon(ft.Icons.CALENDAR_MONTH, size=16, color="grey"),
-                                        ft.Text(f"{ingresso['data']}", size=13, color="grey700"),
+                                        ft.Icon(ft.Icons.CALENDAR_MONTH, size=16, color="on_surface_variant"),
+                                        ft.Text(f"{ingresso['data']}", size=13, color="on_surface_variant"),
                                         ft.VerticalDivider(width=10),
-                                        ft.Icon(ft.Icons.LOCATION_ON, size=16, color="grey"),
-                                        ft.Text(f"{ingresso['local']}", size=13, color="grey700"),
+                                        ft.Icon(ft.Icons.LOCATION_ON, size=16, color="on_surface_variant"),
+                                        ft.Text(f"{ingresso['local']}", size=13, color="on_surface_variant"),
                                     ]
                                 ),
                                 ft.Container(
                                     padding=10,
-                                    border=ft.border.all(1, "black12"),
+                                    border=ft.border.all(1, "outline_variant"),
                                     border_radius=15,
-                                    bgcolor="#f5f5f5",
+                                    bgcolor=ft.Colors.with_opacity(0.1, "on_surface"),
                                     content=ft.Image(
                                         src=qr,
                                         width=180,
@@ -81,7 +81,7 @@ def render_ingressos(page, app_view, route):
                                 ft.Text(
                                     f"ID DO INGRESSO: #{ingresso['ingresso_id']}",
                                     size=10,
-                                    color="grey",
+                                    color="on_surface_variant",
                                     weight=ft.FontWeight.W_300
                                 )
                             ]
@@ -98,17 +98,17 @@ def render_ingressos(page, app_view, route):
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
                 ft.Container(
-                    bgcolor="white",
+                    bgcolor="surface",
                     border_radius=30,
                     shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
                     content=ft.IconButton(
                         icon=ft.Icons.ARROW_BACK,
-                        icon_color="black",
+                        icon_color="on_surface",
                         on_click=lambda e: route(page, app_view, "home")
                     )
                 ),
-                ft.Text("Meus Ingressos", size=24, weight=ft.FontWeight.BOLD, color="black"),
-                ft.IconButton(icon=ft.Icons.MORE_VERT, icon_color="black"),
+                ft.Text("Meus Ingressos", size=24, weight=ft.FontWeight.BOLD, color="on_surface"),
+                ft.IconButton(icon=ft.Icons.MORE_VERT, icon_color="on_surface"),
             ]
         )
     )

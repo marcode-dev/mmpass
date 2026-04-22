@@ -1,6 +1,7 @@
 import flet as ft
 import requests
 from api import API_URL_COMPRAR
+from utils import safe_storage_set
 
 def render_carrinho(page, app_view, route):
     carrinho = getattr(page, 'carrinho', None) or []
@@ -16,7 +17,7 @@ def render_carrinho(page, app_view, route):
     campo_cupom = ft.TextField(
         label="Código de cupom",
         width=220,
-        bgcolor=ft.Colors.WHITE,
+        bgcolor="surface_variant",
         border_radius=10,
         filled=True
     )
@@ -57,6 +58,8 @@ def render_carrinho(page, app_view, route):
         if evento in carrinho:
             carrinho.remove(evento)
             setattr(page, 'carrinho', carrinho)
+            # Salvar no armazenamento persistente
+            safe_storage_set(page, "carrinho_data", carrinho)
         route(page, app_view, "carrinho")
 
     def fechar_animacao(dialog):
@@ -77,8 +80,8 @@ def render_carrinho(page, app_view, route):
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     controls=[
                         ft.Icon(ft.Icons.CHECK_CIRCLE, color="green", size=90),
-                        ft.Text("Compra realizada!", size=24, weight=ft.FontWeight.BOLD, color="black"),
-                        ft.Text("Seu ingresso foi emitido com sucesso.", text_align="center", color="grey"),
+                        ft.Text("Compra realizada!", size=24, weight=ft.FontWeight.BOLD, color="on_surface"),
+                        ft.Text("Seu ingresso foi emitido com sucesso.", text_align="center", color="on_surface_variant"),
                         ft.Container(height=10),
                         ft.Button(
                             "Ver meus ingressos",
@@ -126,23 +129,42 @@ def render_carrinho(page, app_view, route):
     itens = []
     for evento in carrinho:
         card = ft.Container(
-            padding=15,
-            margin=10,
-            border_radius=20,
-            bgcolor=ft.Colors.WHITE,
-            shadow=ft.BoxShadow(blur_radius=15, color=ft.Colors.BLACK12, offset=ft.Offset(0, 5)),
+            padding=10,
+            margin=ft.margin.symmetric(horizontal=15, vertical=5),
+            border_radius=15,
+            bgcolor="surface",
+            shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12, offset=ft.Offset(0, 2)),
             content=ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
-                    ft.Column(
-                        controls=[
-                            ft.Text(evento["nome"], weight="bold", size=16),
-                            ft.Text(f'R$ {evento["preco"]}', color=ft.Colors.GREY_700),
-                        ]
+                    ft.Container(
+                        expand=True,
+                        on_click=lambda e, ev=evento: route(page, app_view, "evento", evento=ev),
+                        content=ft.Row([
+                            ft.Container(
+                                width=60,
+                                height=60,
+                                border_radius=10,
+                                clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
+                                content=ft.Image(
+                                    src=evento.get("imagem", ""),
+                                    fit="cover",
+                                )
+                            ),
+                            ft.Column(
+                                expand=True,
+                                spacing=2,
+                                controls=[
+                                    ft.Text(evento["nome"], weight="bold", size=15, color="on_surface", max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
+                                    ft.Text(f'R$ {evento["preco"]}', color="#818cf8", weight="bold", size=14),
+                                ]
+                            ),
+                        ], spacing=15)
                     ),
                     ft.IconButton(
-                        icon=ft.Icons.DELETE,
-                        icon_color=ft.Colors.RED_400,
+                        icon=ft.Icons.DELETE_OUTLINE,
+                        icon_color="red400",
+                        icon_size=20,
                         tooltip="Remover",
                         on_click=lambda e, ev=evento: remover_item(ev)
                     )
@@ -155,7 +177,7 @@ def render_carrinho(page, app_view, route):
         padding=20,
         margin=15,
         border_radius=20,
-        bgcolor=ft.Colors.WHITE,
+        bgcolor="surface",
         shadow=ft.BoxShadow(blur_radius=20, color=ft.Colors.BLACK12, offset=ft.Offset(0, 5)),
         content=ft.Column(
             spacing=12,
@@ -195,7 +217,7 @@ def render_carrinho(page, app_view, route):
                         overlay_color=ft.Colors.WHITE24,
                         shape=ft.RoundedRectangleBorder(radius=15)
                     ),
-                    on_click=lambda e: sua_funcao_de_pagamento(e, campo_cupom.value)
+                    on_click=lambda _: route(page, app_view, "pagamento")
                 )
             ]
         )
@@ -206,17 +228,17 @@ def render_carrinho(page, app_view, route):
         content=ft.Row(
             controls=[
                 ft.Container(
-                    bgcolor="white",
+                    bgcolor="surface",
                     border_radius=30,
                     shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
                     content=ft.IconButton(
                         icon=ft.Icons.ARROW_BACK,
-                        icon_color="black",
+                        icon_color="on_surface",
                         on_click=lambda e: route(page, app_view, "home")
                     )
                 ),
                 ft.Container(width=10),
-                ft.Text("Meu Carrinho", size=26, weight=ft.FontWeight.BOLD, color="black", expand=True),
+                ft.Text("Meu Carrinho", size=26, weight=ft.FontWeight.BOLD, color="on_surface", expand=True),
             ]
         )
     )
