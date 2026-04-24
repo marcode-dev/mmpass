@@ -30,31 +30,42 @@ def main(page: ft.Page):
     )
 
     fundo_mestre.content = app_view
+    
+    
     page.add(fundo_mestre)
 
     # Inicialização de dados persistentes
     usuario_salvo = safe_storage_get(page, "usuario_logado")
+    # Inicialização de dados persistentes do Carrinho
     carrinho_salvo = safe_storage_get(page, "carrinho_data", default=[])
-    favoritos_salvos = safe_storage_get(page, "favoritos_data", default=[])
-    
     setattr(page, 'usuario_logado', usuario_salvo)
     setattr(page, 'carrinho', carrinho_salvo)
-    setattr(page, 'favoritos', favoritos_salvos)
-    setattr(page, 'cupons_resgatados', [])
+    
+    # Inicialização de cupons resgatados (UI/Visual apenas)
+    resgatados_salvos = safe_storage_get(page, "cupons_resgatados", default=[])
+    setattr(page, 'cupons_resgatados', resgatados_salvos)
 
     try:
-        from api import API_EVENTOS, HEADERS
+        from api import API_EVENTOS, API_CUPONS, API_FAVORITOS, API_CUPONS_USADOS, HEADERS
+        
+        # 1. Carregar Eventos Globais
         response = requests.get(f"{API_EVENTOS}?select=*", headers=HEADERS, timeout=10)
-        if response.status_code == 200:
-            eventos_data = response.json()
-            setattr(page, 'eventos', eventos_data)
-        else:
-            print(f"Erro da API Supabase: {response.text}")
-            setattr(page, 'eventos', [])
+        setattr(page, 'eventos', response.json() if response.status_code == 200 else [])
+
+        # 2. Carregar Regras de Cupons Globais
+        resp_cupons = requests.get(f"{API_CUPONS}?select=*", headers=HEADERS, timeout=10)
+        setattr(page, 'lista_cupons', resp_cupons.json() if resp_cupons.status_code == 200 else [])
+
+        # 3. Sincronização de Dados do Usuário
+        from utils import sync_user_data
+        sync_user_data(page)
+            
     except Exception as e:
-        print(f"Erro ao carregar eventos: {e}")
+        print(f"Erro ao sincronizar dados iniciais: {e}")
         setattr(page, 'eventos', [])
-        # Futuro: Adicionar botão de "Tentar Novamente" na Home
+        setattr(page, 'lista_cupons', [])
+        setattr(page, 'favoritos', [])
+        setattr(page, 'cupons_usados', [])
     
     setup_chat(page, app_view, route)
 

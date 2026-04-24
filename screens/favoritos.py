@@ -9,16 +9,18 @@ def render_favoritos(page, app_view, route):
     app_view.scroll = None
     app_view.expand = True
 
-    eventos_todos = getattr(page, 'eventos', [])
-    favoritos_ids = getattr(page, 'favoritos', [])
+    eventos_todos = getattr(page, 'eventos', []) or []
+    # Garantir que favoritos_ids seja uma lista de strings para comparação resiliente
+    favoritos_ids = [str(fid) for fid in (getattr(page, 'favoritos', []) or [])]
     
     # Filtrar apenas os eventos que são favoritos
     vistos = set()
     eventos_favoritos = []
     for e in eventos_todos:
-        if e["id"] in favoritos_ids and e["id"] not in vistos:
+        eid_str = str(e.get("id"))
+        if eid_str in favoritos_ids and eid_str not in vistos:
             eventos_favoritos.append(e)
-            vistos.add(e["id"])
+            vistos.add(eid_str)
 
     # Header Top
     header = ft.Container(

@@ -67,6 +67,10 @@ def render_login(page, app_view, route):
                         safe_storage_set(page, "usuario_logado", usuario)
                         setattr(page, 'usuario_logado', usuario)
                         
+                        # Sincronização imediata pós-login
+                        from utils import sync_user_data
+                        sync_user_data(page)
+                        
                         show_msg(page, f"Bem-vindo de volta, {usuario['nome']}! 👋")
                         update_chat_visibility(page)
                         route(page, app_view, "home")

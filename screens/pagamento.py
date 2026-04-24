@@ -109,9 +109,25 @@ def render_pagamento(page, app_view, route):
                 sucesso_total = False
         
         if sucesso_total:
+            # Registrar uso de cupom se houver
+            cupom_id = getattr(page, 'cupom_aplicado_id', None)
+            if cupom_id:
+                try:
+                    from api import API_CUPONS_USADOS
+                    requests.post(API_CUPONS_USADOS, headers=HEADERS, json={
+                        "usuario_id": usuario_logado["id"],
+                        "cupom_id": cupom_id
+                    }, timeout=5)
+                    # Atualizar lista local para bloquear reuso imediato
+                    usados = getattr(page, 'cupons_usados', [])
+                    usados.append(cupom_id)
+                    setattr(page, 'cupons_usados', usados)
+                except: pass
+
             carrinho.clear()
             safe_storage_set(page, "carrinho_data", [])
             setattr(page, 'desconto_aplicado', 0)
+            setattr(page, 'cupom_aplicado_id', None)
             animacao_sucesso()
         else:
             show_msg(page, "Falha no processamento. Reinicie seu carrinho e tente de novo.", bgcolor="red")
@@ -140,10 +156,8 @@ def render_pagamento(page, app_view, route):
                     padding=15,
                     bgcolor="#f8fafc",
                     border_radius=12,
-                    on_click=lambda _: page.set_clipboard(chave_pix),
                     content=ft.Row([
-                        ft.Text(chave_pix, size=13, weight="bold", color="on_surface", expand=True),
-                        ft.Icon(ft.Icons.COPY_ALL_ROUNDED, size=20, color="#818cf8")
+                        ft.Text(chave_pix, size=13, weight="bold", color="on_surface", expand=True, text_align="center"),
                     ])
                 )
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=10)

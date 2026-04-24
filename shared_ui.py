@@ -45,9 +45,9 @@ def card_evento(evento, page, app_view, route, largura=250):
     is_destaque = largura is not None and largura > 200
     evento_id = evento.get("id")
     
-    # Lógica de Favoritos
-    favoritos = getattr(page, 'favoritos', [])
-    ja_favorito = evento_id in favoritos
+    # Lógica de Favoritos (Resiliente a tipos)
+    favoritos = [str(fid) for fid in (getattr(page, 'favoritos', []) or [])]
+    ja_favorito = str(evento_id) in favoritos
 
     def toggle_favorito(e):
         from utils import safe_storage_set
@@ -55,31 +55,35 @@ def card_evento(evento, page, app_view, route, largura=250):
         from api import API_FAVORITOS, HEADERS
         import threading
         
-        favs = getattr(page, 'favoritos', [])
+        # 1. Obter e Limpar Duplicatas (Safety First)
+        raw_favs = getattr(page, 'favoritos', [])
+        favs = list(dict.fromkeys(raw_favs)) # Remove duplicatas mantendo ordem
         usuario = getattr(page, 'usuario_logado', None)
         
+        if not usuario: return # Não permite favoritar deslogado
+        
         if evento_id in favs:
-            favs.remove(evento_id)
+            # Remover
+            while evento_id in favs: favs.remove(evento_id)
+            e.control.content.icon = ft.Icons.FAVORITE_BORDER_ROUNDED
             e.control.content.color = "white"
             
-            # Sync com banco
-            if usuario:
-                def remove_db():
-                    try:
-                        requests.delete(f"{API_FAVORITOS}?usuario_id=eq.{usuario['id']}&evento_id=eq.{evento_id}", headers=HEADERS, timeout=5)
-                    except: pass
-                threading.Thread(target=remove_db).start()
+            def remove_db():
+                try: requests.delete(f"{API_FAVORITOS}?usuario_id=eq.{usuario['id']}&evento_id=eq.{evento_id}", headers=HEADERS, timeout=5)
+                except: pass
+            threading.Thread(target=remove_db).start()
         else:
+            # Adicionar
             favs.append(evento_id)
+            e.control.content.icon = ft.Icons.FAVORITE_ROUNDED
             e.control.content.color = "#818cf8"
             
-            # Sync com banco
-            if usuario:
-                def add_db():
-                    try:
-                        requests.post(API_FAVORITOS, json={"usuario_id": usuario['id'], "evento_id": evento_id}, headers=HEADERS, timeout=5)
-                    except: pass
-                threading.Thread(target=add_db).start()
+            def add_db():
+                try: 
+                    # Tenta postar, o banco pode aceitar duplicatas mas o código local estará limpo
+                    requests.post(API_FAVORITOS, json={"usuario_id": usuario['id'], "evento_id": evento_id}, headers=HEADERS, timeout=5)
+                except: pass
+            threading.Thread(target=add_db).start()
         
         setattr(page, 'favoritos', favs)
         safe_storage_set(page, "favoritos_data", favs)

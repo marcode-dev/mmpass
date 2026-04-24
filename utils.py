@@ -100,3 +100,29 @@ def safe_storage_remove(page, key):
     except Exception as e:
         print(f"Erro ao remover do storage: {e}")
     return False
+
+def sync_user_data(page):
+    """Sincroniza favoritos e cupons do usuário logado com o banco de dados."""
+    usuario = getattr(page, 'usuario_logado', None)
+    if not usuario:
+        return
+        
+    from api import API_FAVORITOS, API_CUPONS_USADOS, HEADERS
+    user_id = usuario['id']
+    
+    try:
+        # 1. Favoritos
+        resp_favs = requests.get(f"{API_FAVORITOS}?usuario_id=eq.{user_id}&select=evento_id", headers=HEADERS, timeout=5)
+        if resp_favs.status_code == 200:
+            favs_ids = list(dict.fromkeys([f['evento_id'] for f in resp_favs.json()]))
+            setattr(page, 'favoritos', favs_ids)
+            safe_storage_set(page, "favoritos_data", favs_ids)
+        
+        # 2. Cupons Usados
+        resp_usados = requests.get(f"{API_CUPONS_USADOS}?usuario_id=eq.{user_id}&select=cupom_id", headers=HEADERS, timeout=5)
+        if resp_usados.status_code == 200:
+            usados_ids = [c['cupom_id'] for c in resp_usados.json()]
+            setattr(page, 'cupons_usados', usados_ids)
+            
+    except Exception as e:
+        print(f"Erro na sincronização de dados: {e}")

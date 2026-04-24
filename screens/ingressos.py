@@ -40,6 +40,92 @@ def render_ingressos(page, app_view, route):
         print(f"Erro ao buscar ingressos: {e}")
         ingressos = []
 
+    # 1. Ordenação por data do evento
+    from datetime import datetime
+    
+    def parse_date(date_str):
+        try:
+            # Tenta converter DD/MM/YYYY para objeto datetime para ordenação
+            return datetime.strptime(date_str, "%d/%m/%Y")
+        except:
+            try:
+                # Tenta formato ISO se falhar
+                return datetime.strptime(date_str.split('T')[0], "%Y-%m-%d")
+            except:
+                return datetime.max
+
+    ingressos.sort(key=lambda x: parse_date(x['data']))
+
+    def abrir_modal_ingresso(ingresso):
+        qr = gerar_qr(f"ingresso-{ingresso['ingresso_id']}")
+        
+        def fechar_dialog(e):
+            modal.open = False
+            page.update()
+
+        modal = ft.AlertDialog(
+            content=ft.Container(
+                width=350,
+                height=500, # Altura fixa para garantir o scroll na versão atual
+                padding=10,
+                bgcolor="surface",
+                border_radius=20,
+                content=ft.Column([
+                    ft.Container(
+                        padding=15, bgcolor="purple50", border_radius=50,
+                        content=ft.Icon(ft.Icons.LOCAL_ACTIVITY, size=40, color="purple600")
+                    ),
+                    ft.Column([
+                        ft.Text(ingresso["nome"].upper(), size=22, weight="bold", color="on_surface", text_align="center"),
+                        ft.Text(f"ID: #{ingresso['ingresso_id']}", size=12, color="on_surface_variant"),
+                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=2),
+                    
+                    ft.Divider(height=30, color="outline_variant"),
+                    
+                    ft.Row([
+                        ft.Icon(ft.Icons.CALENDAR_MONTH, size=18, color="purple600"),
+                        ft.Text(f"{ingresso['data']}", size=15, weight="w500"),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    
+                    ft.Row([
+                        ft.Icon(ft.Icons.LOCATION_ON, size=18, color="purple600"),
+                        ft.Text(f"{ingresso['local']}", size=14, color="on_surface_variant"),
+                    ], alignment=ft.MainAxisAlignment.CENTER),
+                    
+                    ft.Container(height=15),
+                    
+                    # Área do QR Code
+                    ft.Container(
+                        padding=15,
+                        bgcolor="white",
+                        border_radius=20,
+                        border=ft.border.all(1, "outline_variant"),
+                        shadow=ft.BoxShadow(blur_radius=15, color="black12"),
+                        content=ft.Image(src=qr, width=220, height=220)
+                    ),
+                    
+                    ft.Container(height=15),
+                    
+                    ft.ElevatedButton(
+                        "Fechar", 
+                        on_click=fechar_dialog,
+                        width=float("inf"), 
+                        height=50,
+                        bgcolor="purple600", 
+                        color="white",
+                        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=12))
+                    )
+                ], tight=False, # Alterado para permitir scroll se necessário
+                   scroll=ft.ScrollMode.AUTO, 
+                   horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
+                   spacing=10
+                )
+            )
+        )
+        page.overlay.append(modal)
+        modal.open = True
+        page.update()
+
     lista_cards = []
 
     if not ingressos:
@@ -52,65 +138,32 @@ def render_ingressos(page, app_view, route):
         )
 
     for ingresso in ingressos:
-        qr = gerar_qr(f"ingresso-{ingresso['ingresso_id']}")
-        
         card = ft.Container(
-            margin=ft.margin.only(bottom=20, left=10, right=10),
-            padding=0, 
-            border_radius=25,
-            bgcolor="surface", 
-            clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
-            content=ft.Row(
-                spacing=0,
-                controls=[
-                    ft.Container(width=15, bgcolor="purple600"),
-                    ft.Container(
-                        padding=20,
-                        expand=True,
-                        content=ft.Column(
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                            spacing=10,
-                            controls=[
-                                ft.Text(
-                                    ingresso["nome"].upper(),
-                                    size=20,
-                                    weight=ft.FontWeight.BOLD,
-                                    color="on_surface",
-                                    text_align=ft.TextAlign.CENTER
-                                ),
-                                ft.Divider(height=1, color="outline_variant"),
-                                ft.Row(
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    controls=[
-                                        ft.Icon(ft.Icons.CALENDAR_MONTH, size=16, color="on_surface_variant"),
-                                        ft.Text(f"{ingresso['data']}", size=13, color="on_surface_variant"),
-                                        ft.VerticalDivider(width=10),
-                                        ft.Icon(ft.Icons.LOCATION_ON, size=16, color="on_surface_variant"),
-                                        ft.Text(f"{ingresso['local']}", size=13, color="on_surface_variant"),
-                                    ]
-                                ),
-                                ft.Container(
-                                    padding=10,
-                                    border=ft.border.all(1, "outline_variant"),
-                                    border_radius=15,
-                                    bgcolor=ft.Colors.with_opacity(0.1, "on_surface"),
-                                    content=ft.Image(
-                                        src=qr,
-                                        width=180,
-                                        height=180,
-                                    )
-                                ),
-                                ft.Text(
-                                    f"ID DO INGRESSO: #{ingresso['ingresso_id']}",
-                                    size=10,
-                                    color="on_surface_variant",
-                                    weight=ft.FontWeight.W_300
-                                )
-                            ]
-                        )
-                    )
-                ]
-            )
+            margin=ft.margin.symmetric(horizontal=20, vertical=8),
+            padding=20, 
+            border_radius=20,
+            bgcolor="surface",
+            border=ft.border.all(1, "outline_variant"),
+            on_click=lambda e, i=ingresso: abrir_modal_ingresso(i),
+            shadow=ft.BoxShadow(blur_radius=10, color="black12", offset=ft.Offset(0, 4)),
+            content=ft.Row([
+                # Miniatura/Ícone representativo
+                ft.Container(
+                    width=60, height=60,
+                    bgcolor="purple50",
+                    border_radius=15,
+                    content=ft.Icon(ft.Icons.LOCAL_ACTIVITY, color="purple600", size=30)
+                ),
+                ft.Container(width=10),
+                ft.Column([
+                    ft.Text(ingresso["nome"], size=16, weight="bold", color="on_surface", no_wrap=True),
+                    ft.Row([
+                        ft.Icon(ft.Icons.CALENDAR_MONTH, size=14, color="on_surface_variant"),
+                        ft.Text(f"{ingresso['data']}", size=12, color="on_surface_variant"),
+                    ], spacing=5),
+                ], expand=True),
+                ft.Icon(ft.Icons.ARROW_FORWARD_IOS_ROUNDED, size=16, color="outline_variant")
+            ])
         )
         lista_cards.append(card)
 
@@ -130,7 +183,7 @@ def render_ingressos(page, app_view, route):
                     )
                 ),
                 ft.Text("Meus Ingressos", size=24, weight=ft.FontWeight.BOLD, color="on_surface"),
-                ft.IconButton(icon=ft.Icons.MORE_VERT, icon_color="on_surface"),
+                ft.IconButton(icon=ft.Icons.HISTORY_ROUNDED, icon_color="on_surface"),
             ]
         )
     )

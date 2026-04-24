@@ -34,25 +34,56 @@ def render_carrinho(page, app_view, route):
 
     def aplicar_cupom(e):
         nonlocal desconto
+        from utils import nivel_usuario
+        
         codigo = campo_cupom.value.upper()
-        if codigo == "MAKO5":
-            desconto = 5
-        elif codigo == "MAKO10":
-            desconto = subtotal * 0.10
-        elif codigo == "VIP20":
-            desconto = subtotal * 0.20
-        elif codigo == "DIAMOND30":
-            desconto = subtotal * 0.30
-        else:
+        lista_regras = getattr(page, 'lista_cupons', [])
+        
+        # 1. Encontrar o cupom na lista vinda do banco
+        cupom_encontrado = next((c for c in lista_regras if c["nome"] == codigo), None)
+        
+        if not cupom_encontrado:
             desconto = 0
-            texto_desconto.value = "❌ Cupom inválido"
+            texto_desconto.value = "❌ Cupom inexistente"
             texto_desconto.color = "red400"
             page.update()
             return
 
+        # 2. Verificar se já foi usado (Tabela cupons_usados)
+        cupons_usados_ids = getattr(page, 'cupons_usados', [])
+        if cupom_encontrado["id"] in cupons_usados_ids:
+            desconto = 0
+            texto_desconto.value = "❌ Cupom já utilizado"
+            texto_desconto.color = "red400"
+            page.update()
+            return
+
+        # 3. Verificar nível do usuário
+        nivel_atual, _ = nivel_usuario(page)
+        ordem = ["Bronze", "Prata", "Ouro", "Diamond"]
+        
+        try:
+            pode_usar = ordem.index(nivel_atual) >= ordem.index(cupom_encontrado["nivel"])
+        except:
+            pode_usar = False
+            
+        if not pode_usar:
+            desconto = 0
+            texto_desconto.value = f"❌ Exige nível {cupom_encontrado['nivel']}"
+            texto_desconto.color = "orange400"
+            page.update()
+            return
+
+        # 4. Calcular desconto (usando o campo 'desconto%' do banco)
+        porcentagem = float(cupom_encontrado.get("desconto%", 0))
+        desconto = subtotal * (porcentagem / 100)
+        
+        # Armazenar ID para registro na compra final
+        setattr(page, 'cupom_aplicado_id', cupom_encontrado["id"])
+
         total = subtotal + taxa_envio - desconto
         texto_total.value = f"R$ {total:.2f}"
-        texto_desconto.value = f"✅ - R$ {desconto:.2f} aplicado"
+        texto_desconto.value = f"✅ - R$ {desconto:.2f} ({int(porcentagem)}%)"
         texto_desconto.color = "green400"
         campo_cupom.value = ""
         page.update()
