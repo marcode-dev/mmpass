@@ -53,7 +53,12 @@ def render_cadastro(page, app_view, route):
             page.update()
             return
 
-        # Hash da senha usando bcrypt (encoding para bytes, dps decodando pra string pra salvar)
+        # Estado de carregamento no botão
+        btn_cadastrar.disabled = True
+        btn_cadastrar.content = ft.ProgressRing(width=20, height=20, color="#1e293b", stroke_width=2)
+        btn_cadastrar.update()
+
+        # Hash da senha
         senha_hash = bcrypt.hashpw(senha.value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         dados = {
@@ -62,13 +67,7 @@ def render_cadastro(page, app_view, route):
             "senha": senha_hash
         }
         
-        btn_cadastrar.disabled = True
-        btn_cadastrar.content = ft.ProgressRing(width=20, height=20, color="white", stroke_width=2)
-        page.update()
-
         try:
-            # Para Supabase (PostgREST), uma chamada POST insere os dados
-            # E Prefer: return=representation nos devolve a row inserida
             response = requests.post(API_USUARIOS, headers=HEADERS, json=dados, timeout=10)
             
             if response.status_code in (200, 201):
@@ -77,25 +76,30 @@ def render_cadastro(page, app_view, route):
                 return
             else:
                 erro_json = response.json()
-                # O Supabase retorna detalhes no campo 'message' ou 'details'
-                mensagem.value = f"Erro: {erro_json.get('message', 'Erro ao criar conta no banco')}"
+                mensagem.value = f"Erro: {erro_json.get('message', 'Erro ao criar conta')}"
         except Exception as ex:
             mensagem.value = f"Erro de conexão com o servidor"
             print(ex)
         
+        # Restaura o botão em caso de falha
         btn_cadastrar.disabled = False
-        btn_cadastrar.content = ft.Text("Criar Conta", weight="bold", color="white")
+        btn_cadastrar.content = ft.Text("Criar Conta", weight="bold", color="#ffffff")
         page.update()
 
+    # Botão com o mesmo gradiente da tela de Login
     btn_cadastrar = ft.Container(
-        content=ft.Text("Criar Conta", weight="bold", color="white"),
+        content=ft.Text("Criar Conta", weight="bold", color="#ffffff"),
         alignment=ft.Alignment(0, 0),
         width=320,
         height=55,
-        bgcolor="#818cf8",
         border_radius=18,
+        gradient=ft.LinearGradient(
+            colors=["#87e4e7", "#ebb1d4"],
+            begin=ft.Alignment(-1, -1),
+            end=ft.Alignment(1, 1),
+        ),
         on_click=cadastrar,
-        shadow=ft.BoxShadow(blur_radius=15, color="purple200", offset=ft.Offset(0, 5))
+        ink=True, # Adiciona o efeito de ripple ao clicar
     )
 
     card_cadastro = ft.Container(
@@ -110,8 +114,8 @@ def render_cadastro(page, app_view, route):
             spacing=25,
             controls=[
                 ft.Column([
-                    ft.Text("MMPass", size=42, weight="bold", color="#1e293b"),
-                    ft.Text("Faça parte da nossa comunidade.", size=14, color="on_surface_variant", text_align="center"),
+                    ft.Text("MMPass", size=42, weight="bold", color="#b388eb"),
+                    ft.Text("Faça parte da nossa comunidade.", size=14, color="#8a7066", text_align="center"),
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=0),
                 
                 ft.Column([
@@ -139,11 +143,6 @@ def render_cadastro(page, app_view, route):
     app_view.controls.append(
         ft.Container(
             expand=True,
-            gradient=ft.LinearGradient(
-                colors=["#93c5fd", "#818cf8", "#c7d2fe"],
-                begin=ft.Alignment(-1, -1),
-                end=ft.Alignment(1, 1),
-            ),
             content=ft.Stack([
                 # Decorativos de fundo
                 ft.Container(width=200, height=200, bgcolor="white24", border_radius=100, top=-50, left=-50, blur=50),

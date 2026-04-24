@@ -136,7 +136,7 @@ def setup_chat(page, app_view, route):
                 ft.Container(
                     padding=15,
                     border_radius=ft.BorderRadius.only(top_left=25, top_right=25),
-                    gradient=ft.LinearGradient(colors=["#93c5fd", "#818cf8"]),
+                    gradient=ft.LinearGradient(colors=["#87e4e7", "#ebb1d4"]),
                     content=ft.Row(
                         controls=[
                             ft.Icon(ft.Icons.SUPPORT_AGENT, color="white", size=24),
@@ -192,7 +192,7 @@ def setup_chat(page, app_view, route):
                 ft.Container(
                     padding=2,
                     border_radius=50,
-                    gradient=ft.LinearGradient(colors=["#93c5fd", "#818cf8"]),
+                    gradient=ft.LinearGradient(colors=["#87e4e7", "#ebb1d4"]),
                     shadow=ft.BoxShadow(blur_radius=15, color="purple200"),
                     content=ft.FloatingActionButton(
                         icon=ft.Icons.SUPPORT_AGENT,

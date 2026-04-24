@@ -1,11 +1,10 @@
-"""
-Tela Principal (Home).
-Lista eventos em destaque, sistema de busca iterativo e filtragem de categorias de festas consultando do Supabase.
-"""
 import flet as ft
 from shared_ui import get_bottom_bar, card_evento
 
 def render_home(page, app_view, route):
+    page.fundo_mestre.gradient = None
+    page.fundo_mestre.bgcolor = ft.Colors.WHITE
+    page.update()
     app_view.scroll = None
     app_view.expand = True
 
@@ -85,7 +84,7 @@ def render_home(page, app_view, route):
     header = ft.Container(
         padding=ft.padding.only(top=50, left=15, right=15, bottom=25),
         gradient=ft.LinearGradient(
-            colors=["#93c5fd", "#818cf8"],
+            colors=["#87e4e7", "#ebb1d4"],
             begin=ft.Alignment(-1, -1),
             end=ft.Alignment(1, 1),
         ),

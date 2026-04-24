@@ -1,7 +1,3 @@
-"""
-Ponto de entrada principal da aplicação (App Entrypoint).
-Inicializa a janela do Flet, gerencia a hidratação de sessão persistente e invoca o roteador raiz.
-"""
 import flet as ft
 import requests
 from router import route
@@ -21,6 +17,7 @@ def main(page: ft.Page):
     fundo_mestre = ft.Container(
         expand=True,
     )
+    page.fundo_mestre = fundo_mestre
 
     app_view = ft.Column(
         expand=True,
