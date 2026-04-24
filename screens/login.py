@@ -10,7 +10,13 @@ from chat import update_chat_visibility
 from utils import show_msg, safe_storage_set
 
 def render_login(page, app_view, route):
-    # Inputs com estilo moderno
+    page.fundo_mestre.gradient = ft.LinearGradient(
+        colors=["#87e4e7", "#ebb1d4"],
+        begin=ft.Alignment(-1, -1),
+        end=ft.Alignment(1, 1),
+    )
+
+
     email = ft.TextField(
         label="Email",
         hint_text="seu@email.com",
@@ -45,12 +51,12 @@ def render_login(page, app_view, route):
             page.update()
             return
 
-        btn_entrar.disabled = True
-        btn_entrar.content = ft.ProgressRing(width=20, height=20, color="white", stroke_width=2)
+        botao_real.disabled = True
+        botao_real.content = ft.ProgressRing(width=20, height=20, stroke_width=2, color="#1e293b")
         page.update()
 
         try:
-            # Buscando o usuário pelo email
+
             url = f"{API_USUARIOS}?email=eq.{email.value}"
             response = requests.get(url, headers=HEADERS, timeout=10)
             
@@ -60,8 +66,7 @@ def render_login(page, app_view, route):
                 if len(usuarios) > 0:
                     usuario = usuarios[0]
                     hash_banco = usuario.get("senha", "")
-                    
-                    # Verificando o hash com a bcrypt
+
                     senha_digitada = senha.value.encode('utf-8')
                     if hash_banco and bcrypt.checkpw(senha_digitada, hash_banco.encode('utf-8')):
                         safe_storage_set(page, "usuario_logado", usuario)
@@ -80,20 +85,33 @@ def render_login(page, app_view, route):
         except Exception as ex:
             mensagem.value = "Erro de conexão com o servidor"
             print(ex)
-        
-        btn_entrar.disabled = False
-        btn_entrar.content = ft.Text("Entrar", weight="bold", color="white")
+
+        botao_real.disabled = False
+        botao_real.content = ft.Text("Entrar", weight="bold", color="#fefefe")
         page.update()
 
-    btn_entrar = ft.Container(
-        content=ft.Text("Entrar", weight="bold", color="white"),
-        alignment=ft.Alignment(0, 0),
+    botao_real = ft.TextButton(
+        content=ft.Text("Entrar", weight="bold", color="#ffffff"),
+        on_click=fazer_login,
+        style=ft.ButtonStyle(
+            bgcolor=ft.Colors.TRANSPARENT,
+            overlay_color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
+            shape=ft.RoundedRectangleBorder(radius=18),
+        ),
         width=320,
         height=55,
-        bgcolor="#818cf8",
+    )
+
+    btn_entrar = ft.Container(
+        width=320,
+        height=55,
         border_radius=18,
-        on_click=fazer_login,
-        shadow=ft.BoxShadow(blur_radius=15, color="purple200", offset=ft.Offset(0, 5))
+        gradient=ft.LinearGradient(
+            colors=["#87e4e7", "#ebb1d4"],
+            begin=ft.Alignment(-1, -1),
+            end=ft.Alignment(1, 1),
+        ),
+        content=botao_real, 
     )
 
     card_login = ft.Container(
@@ -108,8 +126,8 @@ def render_login(page, app_view, route):
             spacing=25,
             controls=[
                 ft.Column([
-                    ft.Text("MMPass", size=42, weight="bold", color="#1e293b"),
-                    ft.Text("Sua próxima experiência começa aqui.", size=14, color="on_surface_variant", text_align="center"),
+                    ft.Text("MMPass", size=42, weight="bold", color="#b388eb"),
+                    ft.Text("Sua próxima experiência começa aqui.", size=14, color="#8a7066", text_align="center"),
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=0),
                 
                 ft.Column([
@@ -136,16 +154,23 @@ def render_login(page, app_view, route):
     app_view.controls.append(
         ft.Container(
             expand=True,
-            gradient=ft.LinearGradient(
-                colors=["#93c5fd", "#818cf8", "#c7d2fe"],
-                begin=ft.Alignment(-1, -1),
-                end=ft.Alignment(1, 1),
-            ),
             content=ft.Stack([
                 # Decorativos de fundo
-                ft.Container(width=200, height=200, bgcolor="white24", border_radius=100, top=-50, left=-50, blur=50),
-                ft.Container(width=150, height=150, bgcolor="white24", border_radius=75, bottom=-30, right=-30, blur=40),
-                # Card Central
+                ft.Container(
+                    width=200, height=200,
+                    bgcolor="white24",
+                    border_radius=100,
+                    top=-50, left=-50,
+                    blur=50
+                ),
+                ft.Container(
+                    width=150, height=150,
+                    bgcolor="white24",
+                    border_radius=75,
+                    bottom=-30, right=-30,
+                    blur=40
+                ),
+
                 ft.Container(
                     alignment=ft.Alignment(0, 0),
                     content=card_login
