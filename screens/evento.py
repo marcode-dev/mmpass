@@ -22,15 +22,36 @@ def render_evento(page, app_view, route, evento):
     cor = cor_lotacao(lotacao_percent)
     clima = clima_evento()
 
+    # Seletor de Quantidade
+    txt_qtd = ft.Text("1", size=18, weight="bold", width=30, text_align="center")
+    txt_preco_total = ft.Text(f"R$ {evento['preco']}", size=22, weight="bold", color="on_surface")
+    
+    def alterar_qtd(delta):
+        nova_qtd = int(txt_qtd.value) + delta
+        if nova_qtd >= 1:
+            txt_qtd.value = str(nova_qtd)
+            # Atualiza o preço total exibido
+            preco_unitario = float(str(evento['preco']).replace(',', '.'))
+            txt_preco_total.value = f"R$ {preco_unitario * nova_qtd:.2f}".replace('.', ',')
+            page.update()
+
     def adicionar_carrinho(e):
+        qtd = int(txt_qtd.value)
         carrinho = getattr(page, 'carrinho', None) or []
-        carrinho.append(evento)
+        
+        for _ in range(qtd):
+            carrinho.append(evento)
+            
         setattr(page, 'carrinho', carrinho)
         # Persistência
         safe_storage_set(page, "carrinho_data", carrinho)
         
-        show_msg(page, f"Festa garantida! {evento['nome']} adicionado ao carrinho 🚀", bgcolor="#818cf8")
+        msg = f"{qtd} ingressos para {evento['nome']} adicionados! 🚀" if qtd > 1 else f"Festa garantida! {evento['nome']} adicionado ao carrinho 🚀"
+        show_msg(page, msg, bgcolor="#818cf8")
         
+        # Pequeno delay para o feedback visual antes de mudar de tela
+        import time
+        # page.update() # Opcional se show_msg já faz
         route(page, app_view, "carrinho")
 
     # Header Hero com Stack
@@ -159,20 +180,33 @@ def render_evento(page, app_view, route, evento):
         bgcolor=ft.Colors.with_opacity(0.9, "surface"),
         blur=ft.Blur(10, 10),
         border=ft.border.only(top=ft.border.BorderSide(1, "outline_variant")),
-        content=ft.Row([
-            ft.Column([
-                ft.Text("Preço unitário", size=12, color="on_surface_variant"),
-                ft.Text(f"R$ {evento['preco']}", size=22, weight="bold", color="on_surface"),
-            ], spacing=2, expand=True),
+        content=ft.Column([
+            ft.Row([
+                ft.Column([
+                    ft.Text("Total da seleção", size=12, color="on_surface_variant"),
+                    txt_preco_total,
+                ], spacing=2, expand=True),
+                # Seletor de Quantidade
+                ft.Container(
+                    bgcolor="surface_variant",
+                    border_radius=15,
+                    padding=ft.padding.symmetric(horizontal=5, vertical=2),
+                    content=ft.Row([
+                        ft.IconButton(ft.Icons.REMOVE_CIRCLE_OUTLINE, icon_size=24, icon_color="#818cf8", on_click=lambda _: alterar_qtd(-1)),
+                        txt_qtd,
+                        ft.IconButton(ft.Icons.ADD_CIRCLE_OUTLINE, icon_size=24, icon_color="#818cf8", on_click=lambda _: alterar_qtd(1)),
+                    ], spacing=5, alignment=ft.MainAxisAlignment.CENTER)
+                ),
+            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
             ft.Container(
                 gradient=ft.LinearGradient(colors=["#93c5fd", "#818cf8"]),
                 border_radius=15,
+                width=float("inf"),
                 content=ft.ElevatedButton(
                     "Adicionar ao Carrinho",
                     color="white",
                     bgcolor="transparent",
                     elevation=0,
-                    width=200,
                     height=50,
                     on_click=adicionar_carrinho,
                     style=ft.ButtonStyle(
@@ -180,7 +214,7 @@ def render_evento(page, app_view, route, evento):
                     )
                 ),
             )
-        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+        ], tight=True, spacing=15)
     )
 
     # Montando a View

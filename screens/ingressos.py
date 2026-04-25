@@ -179,7 +179,7 @@ def render_ingressos(page, app_view, route):
                     content=ft.IconButton(
                         icon=ft.Icons.ARROW_BACK,
                         icon_color="on_surface",
-                        on_click=lambda e: route(page, app_view, "home")
+                        on_click=lambda e: route(page, app_view, "perfil")
                     )
                 ),
                 ft.Text("Meus Ingressos", size=24, weight=ft.FontWeight.BOLD, color="on_surface"),

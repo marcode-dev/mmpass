@@ -9,11 +9,13 @@ def update_chat_visibility(page):
     chat_aberto = getattr(page, 'chat_aberto', None)
     botao_chat = getattr(page, 'botao_chat', None)
     chat_box = getattr(page, 'chat_box', None)
+    active_route = getattr(page, 'active_route', None)
     
     if not botao_chat or not chat_box:
         return
 
-    if usuario_logado:
+    # Esconde se: não logado OU se estiver na tela de detalhes do evento
+    if usuario_logado and active_route != "evento":
         botao_chat.visible = True
         chat_box.visible = chat_aberto
     else:

@@ -4,9 +4,11 @@ Controla a navegação dinâmica entre as diferentes Views (Telas) da arquitetur
 """
 import flet as ft
 import traceback # Verificar onde causou a falha
+from chat import update_chat_visibility
 
 def route(page: ft.Page, app_view: ft.Column, route_name: str, **kwargs):
     try:
+        page.active_route = route_name
         app_view.controls.clear()
         app_view.scroll = None
         
@@ -41,6 +43,7 @@ def route(page: ft.Page, app_view: ft.Column, route_name: str, **kwargs):
             from screens.favoritos import render_favoritos
             render_favoritos(page, app_view, route)
             
+        update_chat_visibility(page)
         page.update()
     except Exception as e:
         # Se houver erro, exibe na tela para diagnóstico rápido
