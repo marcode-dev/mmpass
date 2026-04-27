@@ -55,7 +55,7 @@ def render_perfil(page, app_view, route):
         page.update()
 
     header = ft.Container(
-        padding=ft.padding.only(top=40, bottom=40),
+        padding=ft.padding.only(top=25, bottom=25),
         gradient=ft.LinearGradient(
             colors=["#87e4e7", "#ebb1d4"],
             begin=ft.Alignment(-1, -1),
@@ -67,18 +67,18 @@ def render_perfil(page, app_view, route):
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
                 ft.CircleAvatar(
-                    radius=55,
+                    radius=42,
                     bgcolor="surface",
                     content=ft.Text(
                         usuario_logado["nome"][0].upper(),
-                        size=40,
+                        size=32,
                         weight=ft.FontWeight.BOLD,
                         color="#818cf8"
                     ),
                 ),
-                ft.Container(height=10),
-                ft.Text(usuario_logado["nome"], size=26, weight=ft.FontWeight.BOLD, color="white"),
-                ft.Text(usuario_logado["email"], color="white70"),
+                ft.Container(height=8),
+                ft.Text(usuario_logado["nome"], size=22, weight=ft.FontWeight.BOLD, color="white"),
+                ft.Text(usuario_logado["email"], size=13, color="white70"),
             ]
         )
     )

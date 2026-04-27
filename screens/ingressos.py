@@ -17,8 +17,8 @@ def render_ingressos(page, app_view, route):
         return
 
     try:
-        # Busca no Supabase puxando dados da tabela relacional "eventos"
-        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id,data_compra,eventos(*)"
+        # Busca no Supabase puxando dados da tabela relacional "eventos" e o campo "desconto"
+        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id,data_compra,desconto,eventos(*)"
         response = requests.get(url, headers=HEADERS, timeout=10)
         
         if response.status_code == 200:
@@ -28,11 +28,19 @@ def render_ingressos(page, app_view, route):
             for item in raw_ingressos:
                 if item.get("eventos"):
                     ev = item["eventos"]
+                    cupom_id = item.get("desconto")
+                    lista_cupons = getattr(page, 'lista_cupons', [])
+                    cupom_info = next((c for c in lista_cupons if c["id"] == cupom_id), None)
+                    porcentagem = int(cupom_info["desconto%"]) if cupom_info else 0
+
                     ingressos.append({
                         "ingresso_id": item["id"],
                         "nome": ev["nome"],
                         "data": ev["data"],
-                        "local": ev["local"]
+                        "local": ev["local"],
+                        "imagem": ev.get("imagem"),
+                        "desconto_perc": porcentagem,
+                        "cupom_id": cupom_id
                     })
         else:
             ingressos = []
@@ -78,6 +86,15 @@ def render_ingressos(page, app_view, route):
                     ft.Column([
                         ft.Text(ingresso["nome"].upper(), size=22, weight="bold", color="on_surface", text_align="center"),
                         ft.Text(f"ID: #{ingresso['ingresso_id']}", size=12, color="on_surface_variant"),
+                        ft.Row([
+                            ft.Container(
+                                visible=bool(ingresso.get("desconto_perc")),
+                                padding=ft.padding.symmetric(horizontal=8, vertical=4),
+                                bgcolor="green50",
+                                border_radius=8,
+                                content=ft.Text(f"Desconto aplicado: {ingresso.get('desconto_perc')}%", size=11, color="green700", weight="bold")
+                            ) if ingresso.get("desconto_perc") else ft.Container(),
+                        ], alignment=ft.MainAxisAlignment.CENTER),
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=2),
                     
                     ft.Divider(height=30, color="outline_variant"),
@@ -150,9 +167,13 @@ def render_ingressos(page, app_view, route):
                 # Miniatura/Ícone representativo
                 ft.Container(
                     width=60, height=60,
-                    bgcolor="purple50",
+                    bgcolor="grey100",
                     border_radius=15,
-                    content=ft.Icon(ft.Icons.LOCAL_ACTIVITY, color="purple600", size=30)
+                    clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
+                    content=ft.Image(
+                        src=ingresso.get("imagem") or "https://via.placeholder.com/60",
+                        fit="cover",
+                    )
                 ),
                 ft.Container(width=10),
                 ft.Column([
@@ -160,6 +181,13 @@ def render_ingressos(page, app_view, route):
                     ft.Row([
                         ft.Icon(ft.Icons.CALENDAR_MONTH, size=14, color="on_surface_variant"),
                         ft.Text(f"{ingresso['data']}", size=12, color="on_surface_variant"),
+                        ft.Container(
+                            visible=bool(ingresso.get("desconto_perc")),
+                            padding=ft.padding.symmetric(horizontal=6, vertical=2),
+                            bgcolor="green50",
+                            border_radius=5,
+                            content=ft.Text(f"-{ingresso.get('desconto_perc')}%", size=10, color="green700", weight="bold")
+                        ) if ingresso.get("desconto_perc") else ft.Container(),
                     ], spacing=5),
                 ], expand=True),
                 ft.Icon(ft.Icons.ARROW_FORWARD_IOS_ROUNDED, size=16, color="outline_variant")

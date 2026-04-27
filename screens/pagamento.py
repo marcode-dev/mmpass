@@ -86,9 +86,13 @@ def render_pagamento(page, app_view, route):
                     continue
 
                 # 2. Registrar Ingresso
+                cupom_id = getattr(page, 'cupom_aplicado_id', None)
+                desconto_perc = getattr(page, 'desconto_porcentagem', 0)
+                
                 novo_ingresso = {
                     "usuario_id": usuario_logado["id"],
-                    "evento_id": evento["id"]
+                    "evento_id": evento["id"],
+                    "desconto": cupom_id # Agora armazena o ID do cupom
                 }
                 resp_ing = requests.post(API_INGRESSOS, headers=HEADERS, json=novo_ingresso, timeout=10)
                 
@@ -127,6 +131,7 @@ def render_pagamento(page, app_view, route):
             carrinho.clear()
             safe_storage_set(page, "carrinho_data", [])
             setattr(page, 'desconto_aplicado', 0)
+            setattr(page, 'desconto_porcentagem', 0)
             setattr(page, 'cupom_aplicado_id', None)
             animacao_sucesso()
         else:

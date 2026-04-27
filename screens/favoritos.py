@@ -24,7 +24,7 @@ def render_favoritos(page, app_view, route):
 
     # Header Top
     header = ft.Container(
-        padding=ft.padding.only(top=50, left=20, right=20, bottom=20),
+        padding=ft.padding.only(top=35, left=20, right=20, bottom=15),
         bgcolor="surface",
         content=ft.Row([
             ft.IconButton(ft.Icons.ARROW_BACK_IOS_NEW_ROUNDED, icon_size=20, on_click=lambda _: route(page, app_view, "perfil")),
@@ -74,3 +74,45 @@ def render_favoritos(page, app_view, route):
             ]
         )
     )
+
+    # Lógica de Onboarding (Sistema de Hype) - Aparece se não houver favoritos
+    if len(eventos_favoritos) == 0:
+        from utils import safe_storage_get, safe_storage_set
+        ja_viu = safe_storage_get(page, "hype_modal_v4") # Versão 4 para resetar teste
+        
+        if str(ja_viu) != "1":
+            def fechar_guia(e):
+                dialog.open = False
+                page.update()
+                safe_storage_set(page, "hype_modal_v4", "1")
+
+            dialog = ft.AlertDialog(
+                modal=True,
+                content=ft.Container(
+                    width=320, height=400, padding=20,
+                    content=ft.Column([
+                        ft.Container(
+                            padding=20, bgcolor="purple50", border_radius=50,
+                            content=ft.Icon(ft.Icons.AUTO_AWESOME_ROUNDED, size=50, color="#818cf8")
+                        ),
+                        ft.Text("Impulsione o Hype! 🚀", size=22, weight="bold", text_align="center"),
+                        ft.Text(
+                            "Sabia que favoritar eventos impulsiona nosso 'Sistema de Hype'?\n\n"
+                            "Ao favoritar, você destaca os eventos e pode receber notificações de promoções exclusivas!",
+                            text_align="center", color="on_surface_variant", size=14
+                        ),
+                        ft.ElevatedButton(
+                            "Entendi!",
+                            on_click=fechar_guia,
+                            width=float("inf"), height=50,
+                            bgcolor="#818cf8", color="white",
+                            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=12))
+                        )
+                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=20)
+                ),
+                shape=ft.RoundedRectangleBorder(radius=30),
+            )
+            page.overlay.append(dialog)
+            page.dialog = dialog
+            dialog.open = True
+            page.update()

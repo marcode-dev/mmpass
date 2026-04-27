@@ -75,8 +75,11 @@ def render_cupons(page, app_view, route):
 
     barra = ft.ProgressBar(width=300, value=min(total / meta, 1), color="white", bgcolor="white24")
 
-    # Lista vinda do banco (carregada no eventos.py)
+    # Lista vinda do banco (carregada no eventos.py) e ordenada (usados por último)
     lista_regras = getattr(page, 'lista_cupons', [])
+    # Filtrar para não exibir nível "EasterEgg" no app
+    lista_regras = [c for c in lista_regras if c.get("nivel") != "EasterEgg"]
+    lista_regras = sorted(lista_regras, key=lambda c: c["id"] in cupons_usados_ids)
 
     def pode_usar(nivel_cupom):
         ordem = ["Bronze", "Prata", "Ouro", "Diamond"]
@@ -124,7 +127,12 @@ def render_cupons(page, app_view, route):
                             ft.Icon(ft.Icons.LOCAL_OFFER_ROUNDED, color="#818cf8", size=20)
                         ]
                     ),
-                    ft.Text(f"{cupom['desconto%']}% de desconto disponível para você.", size=14, color="on_surface_variant"),
+                    ft.Text(
+                        "Você já aproveitou este desconto em uma compra anterior." if ja_usado
+                        else f"{cupom['desconto%']}% de desconto disponível para você." if liberado 
+                        else f"{cupom['desconto%']}% de desconto exclusivo para nível {cupom['nivel']}.", 
+                        size=14, color="on_surface_variant"
+                    ),
                     ft.Row([
                         ft.Container(
                             padding=ft.padding.all(5),

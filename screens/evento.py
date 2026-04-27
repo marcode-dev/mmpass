@@ -58,7 +58,7 @@ def render_evento(page, app_view, route, evento):
     hero_section = ft.Stack(
         controls=[
             ft.Container(
-                height=350,
+                height=260,
                 content=ft.Image(
                     src=evento.get("imagem", ""),
                     fit="cover",
@@ -67,7 +67,7 @@ def render_evento(page, app_view, route, evento):
             ),
             # Gradiente de sobreposição para leitura
             ft.Container(
-                height=350,
+                height=260,
                 gradient=ft.LinearGradient(
                     begin=ft.Alignment(0, 0.5),
                     end=ft.Alignment(0, 1),
@@ -76,7 +76,7 @@ def render_evento(page, app_view, route, evento):
             ),
             # Botão de Voltar Flutuante
             ft.Container(
-                top=40,
+                top=30,
                 left=20,
                 content=ft.Container(
                     bgcolor="#33ffffff",
@@ -157,16 +157,76 @@ def render_evento(page, app_view, route, evento):
                     ], spacing=10)
                 ),
 
-                # Descrição (Placeholder profissional)
+                # Seção de Descrição Refatorada e Enriquecida
                 ft.Column([
-                    ft.Text("Sobre o Evento", size=18, weight="bold"),
+                    ft.Row([
+                        ft.Text("Sobre a Experiência", size=20, weight="bold"),
+                        ft.Container(
+                            padding=ft.padding.symmetric(horizontal=8, vertical=4),
+                            bgcolor="#818cf822",
+                            border_radius=8,
+                            content=ft.Row([
+                                ft.Icon(ft.Icons.AUTO_AWESOME, size=14, color="#818cf8"),
+                                ft.Text("Hype Alta", size=10, weight="bold", color="#818cf8")
+                            ], spacing=4)
+                        )
+                    ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                    
                     ft.Text(
-                        f"Prepare-se para uma experiência inesquecível em {evento['local']}. "
-                        "Este evento exclusivo traz o melhor do entretenimento com segurança e conforto garantidos pela MMPass. "
-                        "Não perca a chance de fazer parte deste momento único.",
+                        evento.get("descricao") or (
+                            f"Aproveite o melhor de {evento['nome']} em {evento['local']}. "
+                            "Um evento cuidadosamente planejado para oferecer uma experiência imersiva, "
+                            "com infraestrutura de ponta e os melhores profissionais do setor. "
+                            "Garanta seu lugar e faça parte de algo extraordinário."
+                        ),
                         color="on_surface_variant"
                     ),
-                ], spacing=10),
+                    
+                    # Badges de Destaque
+                    ft.Container(height=10),
+                    ft.Row([
+                        ft.Container(
+                            padding=ft.padding.symmetric(horizontal=12, vertical=8),
+                            bgcolor="#f8fafc",
+                            border_radius=12,
+                            border=ft.border.all(1, "#e2e8f0"),
+                            content=ft.Row([
+                                ft.Icon(ft.Icons.VERIFIED_USER_OUTLINED, size=16, color="#0f172a"),
+                                ft.Text("Segurança VIP", size=12, weight="w500", color="#0f172a")
+                            ], spacing=6)
+                        ),
+                        ft.Container(
+                            padding=ft.padding.symmetric(horizontal=12, vertical=8),
+                            bgcolor="#f8fafc",
+                            border_radius=12,
+                            border=ft.border.all(1, "#e2e8f0"),
+                            content=ft.Row([
+                                ft.Icon(ft.Icons.QR_CODE_2_ROUNDED, size=16, color="#0f172a"),
+                                ft.Text("Entrada Digital", size=12, weight="w500", color="#0f172a")
+                            ], spacing=6)
+                        ),
+                    ], spacing=10),
+                    
+                    # Info Úteis
+                    ft.Container(height=15),
+                    ft.Text("Informações Importantes", size=18, weight="bold"),
+                    ft.Column([
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.CREDIT_CARD_ROUNDED, color="#64748b", size=20),
+                            title=ft.Text("Formas de Pagamento", size=14, weight="bold"),
+                            subtitle=ft.Text("PIX com 5% OFF ou cartão em até 12x.", size=12),
+                            dense=True,
+                            visual_density=ft.VisualDensity.COMPACT,
+                        ),
+                        ft.ListTile(
+                            leading=ft.Icon(ft.Icons.MONETIZATION_ON_OUTLINED, color="#64748b", size=20),
+                            title=ft.Text("Políticas de Reembolso", size=14, weight="bold"),
+                            subtitle=ft.Text("Cancelamento grátis em até 7 dias após a compra.", size=12),
+                            dense=True,
+                            visual_density=ft.VisualDensity.COMPACT,
+                        ),
+                    ], spacing=0)
+                ], spacing=12),
             ]
         )
     )

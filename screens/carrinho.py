@@ -50,8 +50,11 @@ def render_carrinho(page, app_view, route):
             return
 
         # 2. Verificar se já foi usado (Tabela cupons_usados)
+        # Cupons "EasterEgg" podem ser usados indefinidamente (ignoram trava de reuso)
         cupons_usados_ids = getattr(page, 'cupons_usados', [])
-        if cupom_encontrado["id"] in cupons_usados_ids:
+        is_easter_egg = cupom_encontrado.get("nivel") == "EasterEgg"
+        
+        if not is_easter_egg and cupom_encontrado["id"] in cupons_usados_ids:
             desconto = 0
             texto_desconto.value = "❌ Cupom já utilizado"
             texto_desconto.color = "red400"
@@ -59,11 +62,12 @@ def render_carrinho(page, app_view, route):
             return
 
         # 3. Verificar nível do usuário
+        # Cupons "EasterEgg" ignoram nível do usuário
         nivel_atual, _ = nivel_usuario(page)
         ordem = ["Bronze", "Prata", "Ouro", "Diamond"]
         
         try:
-            pode_usar = ordem.index(nivel_atual) >= ordem.index(cupom_encontrado["nivel"])
+            pode_usar = is_easter_egg or ordem.index(nivel_atual) >= ordem.index(cupom_encontrado["nivel"])
         except:
             pode_usar = False
             
@@ -80,6 +84,8 @@ def render_carrinho(page, app_view, route):
         
         # Armazenar ID para registro na compra final
         setattr(page, 'cupom_aplicado_id', cupom_encontrado["id"])
+        setattr(page, 'desconto_porcentagem', porcentagem)
+
 
         total = subtotal + taxa_envio - desconto
         texto_total.value = f"R$ {total:.2f}"
