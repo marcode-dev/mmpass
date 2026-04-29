@@ -96,7 +96,7 @@ def render_evento(page, app_view, route, evento):
 
     # Conteúdo Detalhado
     content_section = ft.Container(
-        padding=ft.padding.only(left=25, right=25, top=20, bottom=100),
+        padding=ft.padding.only(left=25, right=25, top=20, bottom=180),
         content=ft.Column(
             spacing=25,
             controls=[

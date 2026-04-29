@@ -66,6 +66,42 @@ def main(page: ft.Page):
     
     setup_chat(page, app_view, route)
 
+    def watch_events():
+        from api import API_EVENTOS, HEADERS
+        import requests
+        import time
+        while True:
+            time.sleep(15)  # Verifica a cada 15 segundos
+            try:
+                # Busca apenas os IDs para economizar banda
+                response = requests.get(f"{API_EVENTOS}?select=id", headers=HEADERS, timeout=10)
+                if response.status_code == 200:
+                    ids_recentes = {e['id'] for e in response.json()}
+                    eventos_atuais = getattr(page, 'eventos', [])
+                    ids_atuais = {e['id'] for e in eventos_atuais}
+                    
+                    # Se encontrou IDs novos ou se algum foi removido
+                    if ids_recentes != ids_atuais:
+                        # Busca os dados completos atualizados
+                        resp_full = requests.get(f"{API_EVENTOS}?select=*", headers=HEADERS, timeout=10)
+                        if resp_full.status_code == 200:
+                            setattr(page, 'eventos', resp_full.json())
+                            
+                            # Atualiza a home se o usuário estiver lá
+                            if getattr(page, 'active_route', '') == "home":
+                                page.snack_bar = ft.SnackBar(
+                                    content=ft.Text("Lista de eventos atualizada!", color="white", weight="bold"),
+                                    bgcolor="#818cf8"
+                                )
+                                page.snack_bar.open = True
+                                route(page, app_view, "home")
+            except Exception as e:
+                pass
+
+    # Inicia a tarefa em background usando threading
+    import threading
+    threading.Thread(target=watch_events, daemon=True).start()
+
     # Redirecionamento Inteligente
     if usuario_salvo:
         route(page, app_view, "home")

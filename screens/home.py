@@ -10,36 +10,36 @@ def render_home(page, app_view, route):
 
     eventos_todos = getattr(page, 'eventos', None) or []
     
-    # Cálculo Global do Sistema de Hype
-    from api import API_FAVORITOS, HEADERS
+    # Cálculo Global de Ingressos (Em Alta)
+    from api import API_INGRESSOS, HEADERS
     import requests
-    hype_counts = {}
+    ingressos_counts = {}
     try:
-        resp = requests.get(f"{API_FAVORITOS}?select=evento_id", headers=HEADERS, timeout=5)
+        resp = requests.get(f"{API_INGRESSOS}?select=evento_id", headers=HEADERS, timeout=5)
         if resp.status_code == 200:
-            favs = resp.json()
-            for f in favs:
-                eid = f["evento_id"]
-                hype_counts[eid] = hype_counts.get(eid, 0) + 1
+            ingressos = resp.json()
+            for i in ingressos:
+                eid = i.get("evento_id")
+                if eid:
+                    ingressos_counts[eid] = ingressos_counts.get(eid, 0) + 1
     except:
         pass
 
     # Injeta o contador nos eventos
     for e in eventos_todos:
-        e["hypes"] = hype_counts.get(e["id"], 0)
+        e["ingressos_vendidos"] = ingressos_counts.get(e["id"], 0)
 
-    # Filtra Em Alta (Mínimo 10 hypes conforme solicitado)
+    # Filtra Em Alta (Mais de 5 ingressos)
     eventos_em_alta = sorted(
-        [e for e in eventos_todos if e["hypes"] >= 10],
-        key=lambda x: x["hypes"],
+        [e for e in eventos_todos if e["ingressos_vendidos"] > 5],
+        key=lambda x: x["ingressos_vendidos"],
         reverse=True
     )
     
-    # Regra de exibição: Mínimo 3 para mostrar a seção, Máximo 6 em exibição
-    # Só adiciona seção Em Alta se houver eventos com Hype >= 10 e ao menos 3 eventos
-    mostrar_em_alta = len(eventos_em_alta) >= 3
+    # Regra de exibição: Máximo 5 eventos em exibição
+    mostrar_em_alta = len(eventos_em_alta) > 0
     if mostrar_em_alta:
-        eventos_em_alta = eventos_em_alta[:6]
+        eventos_em_alta = eventos_em_alta[:5]
     
     # Se não houver eventos, mostra estado de erro com Retry
     if not eventos_todos:
