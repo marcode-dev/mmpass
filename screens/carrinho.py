@@ -199,7 +199,7 @@ def render_carrinho(page, app_view, route):
             controls=[
                 ft.Text("Resumo do Pedido", size=20, weight="bold"),
                 ft.Row([ft.Text("Subtotal"), ft.Text(f"R$ {subtotal:.2f}".replace('.', ','))], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                ft.Row([ft.Text("Taxa de envio"), ft.Text(f"R$ {taxa_envio:.2f}".replace('.', ','))], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
+                ft.Row([ft.Text("Taxa do site"), ft.Text(f"R$ {taxa_envio:.2f}".replace('.', ','))], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Row([ft.Text("Desconto"), texto_desconto], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
                 ft.Divider(),
                 ft.Row([ft.Text("Total Geral", weight="bold"), texto_total], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),

@@ -56,13 +56,14 @@ def render_login(page, app_view, route):
         page.update()
 
         try:
-
+            # Verifica se há um email correspondente no banco de dados
             url = f"{API_USUARIOS}?email=eq.{email.value}"
             response = requests.get(url, headers=HEADERS, timeout=10)
             
             if response.status_code == 200:
+                # Se sim, compara a senha digitada com o hash armazenado usando bcrypt
                 usuarios = response.json()
-             
+            
                 if len(usuarios) > 0:
                     usuario = usuarios[0]
                     hash_banco = usuario.get("senha", "")
