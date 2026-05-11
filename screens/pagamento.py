@@ -88,11 +88,13 @@ def render_pagamento(page, app_view, route):
                 # 2. Registrar Ingresso
                 cupom_id = getattr(page, 'cupom_aplicado_id', None)
                 desconto_perc = getattr(page, 'desconto_porcentagem', 0)
+                token = gerar_token(12)
                 
                 novo_ingresso = {
                     "usuario_id": usuario_logado["id"],
                     "evento_id": evento["id"],
-                    "desconto": cupom_id # Agora armazena o ID do cupom
+                    "desconto": cupom_id, # Agora armazena o ID do cupom
+                    "codigo": token
                 }
                 resp_ing = requests.post(API_INGRESSOS, headers=HEADERS, json=novo_ingresso, timeout=10)
                 

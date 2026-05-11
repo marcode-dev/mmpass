@@ -18,7 +18,7 @@ def render_ingressos(page, app_view, route):
 
     try:
         # Busca no Supabase puxando dados da tabela relacional "eventos" e o campo "desconto"
-        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id,data_compra,desconto,eventos(*)"
+        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id,data_compra,desconto,codigo,eventos(*)"
         response = requests.get(url, headers=HEADERS, timeout=10)
         
         if response.status_code == 200:
@@ -35,6 +35,7 @@ def render_ingressos(page, app_view, route):
 
                     ingressos.append({
                         "ingresso_id": item["id"],
+                        "codigo": item.get("codigo"),
                         "nome": ev["nome"],
                         "data": ev["data"],
                         "local": ev["local"],
@@ -65,7 +66,7 @@ def render_ingressos(page, app_view, route):
     ingressos.sort(key=lambda x: parse_date(x['data']))
 
     def abrir_modal_ingresso(ingresso):
-        qr = gerar_qr(f"ingresso-{ingresso['ingresso_id']}")
+        qr = gerar_qr(ingresso['codigo'])
         
         def fechar_dialog(e):
             modal.open = False

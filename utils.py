@@ -60,6 +60,12 @@ def gerar_qr(texto):
     img_str = base64.b64encode(buffer.getvalue()).decode()
     return f"data:image/png;base64,{img_str}"
 
+def gerar_token(tamanho=10):
+    import secrets
+    import string
+    caracteres = string.ascii_uppercase + string.digits
+    return ''.join(secrets.choice(caracteres) for _ in range(tamanho))
+
 def show_msg(page, text, color="white", bgcolor=None):
     if not bgcolor:
         bgcolor = "green600" if "sucesso" in text.lower() or "✅" in text else "surfacevariant"
