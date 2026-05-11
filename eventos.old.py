@@ -1359,7 +1359,7 @@ def main(page: ft.Page):
     def gerar_qr(texto):
         qr = qrcode.make(texto)
         buffer = BytesIO()
-        qr.save(buffer, format="PNG")
+        qr.save(buffer, "PNG")
         img_str = base64.b64encode(buffer.getvalue()).decode()
         return f"data:image/png;base64,{img_str}"
 

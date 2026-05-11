@@ -54,9 +54,9 @@ def nivel_usuario(page):
         return "Diamond", "💎"
 
 def gerar_qr(texto):
-    qr = qrcode.make(texto)
+    qr_img = qrcode.make(texto)
     buffer = BytesIO()
-    qr.save(buffer, format="PNG")
+    qr_img.save(buffer, "PNG")
     img_str = base64.b64encode(buffer.getvalue()).decode()
     return f"data:image/png;base64,{img_str}"
 

@@ -5,7 +5,7 @@ Orquestra o registro atômico de compra: confere lotação, deduz cupons, adicio
 import flet as ft
 import requests
 from api import API_EVENTOS, API_INGRESSOS, HEADERS
-from utils import show_msg, gerar_qr, safe_storage_set
+from utils import show_msg, gerar_qr, safe_storage_set, gerar_token
 
 def render_pagamento(page, app_view, route):
     carrinho = getattr(page, 'carrinho', None) or []
