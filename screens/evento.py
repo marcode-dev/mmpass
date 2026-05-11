@@ -96,7 +96,7 @@ def render_evento(page, app_view, route, evento):
 
     # Conteúdo Detalhado
     content_section = ft.Container(
-        padding=ft.padding.only(left=25, right=25, top=20, bottom=180),
+        padding=ft.Padding(25, 20, 25, 180),
         content=ft.Column(
             spacing=25,
             controls=[
@@ -162,7 +162,7 @@ def render_evento(page, app_view, route, evento):
                     ft.Row([
                         ft.Text("Sobre a Experiência", size=20, weight="bold"),
                         ft.Container(
-                            padding=ft.padding.symmetric(horizontal=8, vertical=4),
+                            padding=ft.Padding(8, 4, 8, 4),
                             bgcolor="#818cf822",
                             border_radius=8,
                             content=ft.Row([
@@ -186,7 +186,7 @@ def render_evento(page, app_view, route, evento):
                     ft.Container(height=10),
                     ft.Row([
                         ft.Container(
-                            padding=ft.padding.symmetric(horizontal=12, vertical=8),
+                            padding=ft.Padding(12, 8, 12, 8),
                             bgcolor="#f8fafc",
                             border_radius=12,
                             border=ft.border.all(1, "#e2e8f0"),
@@ -196,7 +196,7 @@ def render_evento(page, app_view, route, evento):
                             ], spacing=6)
                         ),
                         ft.Container(
-                            padding=ft.padding.symmetric(horizontal=12, vertical=8),
+                            padding=ft.Padding(12, 8, 12, 8),
                             bgcolor="#f8fafc",
                             border_radius=12,
                             border=ft.border.all(1, "#e2e8f0"),
@@ -236,7 +236,7 @@ def render_evento(page, app_view, route, evento):
         bottom=0,
         left=0,
         right=0,
-        padding=ft.padding.only(left=25, right=25, top=15, bottom=25),
+        padding=ft.Padding(25, 15, 25, 25),
         bgcolor=ft.Colors.with_opacity(0.9, "surface"),
         blur=ft.Blur(10, 10),
         border=ft.border.only(top=ft.border.BorderSide(1, "outline_variant")),
@@ -250,7 +250,7 @@ def render_evento(page, app_view, route, evento):
                 ft.Container(
                     bgcolor="surface_variant",
                     border_radius=15,
-                    padding=ft.padding.symmetric(horizontal=5, vertical=2),
+                    padding=ft.Padding(5, 2, 5, 2),
                     content=ft.Row([
                         ft.IconButton(ft.Icons.REMOVE_CIRCLE_OUTLINE, icon_size=24, icon_color="#818cf8", on_click=lambda _: alterar_qtd(-1)),
                         txt_qtd,

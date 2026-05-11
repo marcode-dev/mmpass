@@ -55,7 +55,7 @@ def render_perfil(page, app_view, route):
         page.update()
 
     header = ft.Container(
-        padding=ft.padding.only(top=25, bottom=25),
+        padding=ft.Padding(0, 25, 0, 25),
         gradient=ft.LinearGradient(
             colors=["#87e4e7", "#ebb1d4"],
             begin=ft.Alignment(-1, -1),

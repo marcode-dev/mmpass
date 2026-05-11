@@ -278,7 +278,7 @@ def render_pagamento(page, app_view, route):
             controls=[
                 # Top Header
                 ft.Container(
-                    padding=ft.padding.only(top=50, left=20, right=20, bottom=20),
+                    padding=ft.Padding(20, 50, 20, 20),
                     bgcolor="surface",
                     content=ft.Row([
                         ft.IconButton(ft.Icons.ARROW_BACK_IOS_NEW_ROUNDED, icon_size=20, on_click=lambda _: route(page, app_view, "carrinho")),
@@ -289,7 +289,7 @@ def render_pagamento(page, app_view, route):
                 # Conteúdo Principal
                 ft.Container(
                     expand=True,
-                    padding=ft.padding.only(left=25, right=25, top=10),
+                    padding=ft.Padding(25, 10, 25, 0),
                     content=ft.Column(
                         scroll=ft.ScrollMode.AUTO,
                         spacing=30,
@@ -323,7 +323,7 @@ def render_pagamento(page, app_view, route):
                             
                             # Rodapé com Botão
                             ft.Container(
-                                padding=ft.padding.only(top=10, bottom=30),
+                                padding=ft.Padding(0, 10, 0, 30),
                                 content=btn_pagar
                             )
                         ]

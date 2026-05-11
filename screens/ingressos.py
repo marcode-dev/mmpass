@@ -90,7 +90,7 @@ def render_ingressos(page, app_view, route):
                         ft.Row([
                             ft.Container(
                                 visible=bool(ingresso.get("desconto_perc")),
-                                padding=ft.padding.symmetric(horizontal=8, vertical=4),
+                                padding=ft.Padding(8, 4, 8, 4),
                                 bgcolor="green50",
                                 border_radius=8,
                                 content=ft.Text(f"Desconto aplicado: {ingresso.get('desconto_perc')}%", size=11, color="green700", weight="bold")
@@ -150,14 +150,14 @@ def render_ingressos(page, app_view, route):
         lista_cards.append(
             ft.Container(
                 content=ft.Text("Você ainda não possui ingressos.", size=18, color="on_surface_variant"),
-                margin=ft.margin.only(top=50),
+                margin=ft.Margin(0, 50, 0, 0),
                 alignment=ft.Alignment(0, 0) 
             )
         )
 
     for ingresso in ingressos:
         card = ft.Container(
-            margin=ft.margin.symmetric(horizontal=20, vertical=8),
+            margin=ft.Margin(20, 8, 20, 8),
             padding=20, 
             border_radius=20,
             bgcolor="surface",
@@ -184,7 +184,7 @@ def render_ingressos(page, app_view, route):
                         ft.Text(f"{ingresso['data']}", size=12, color="on_surface_variant"),
                         ft.Container(
                             visible=bool(ingresso.get("desconto_perc")),
-                            padding=ft.padding.symmetric(horizontal=6, vertical=2),
+                            padding=ft.Padding(6, 2, 6, 2),
                             bgcolor="green50",
                             border_radius=5,
                             content=ft.Text(f"-{ingresso.get('desconto_perc')}%", size=10, color="green700", weight="bold")

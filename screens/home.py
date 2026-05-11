@@ -160,7 +160,7 @@ def render_home(page, app_view, route):
     )
 
     header = ft.Container(
-        padding=ft.padding.only(top=20, left=15, right=15, bottom=10),
+        padding=ft.Padding(15, 20, 15, 10),
         gradient=ft.LinearGradient(
             colors=["#87e4e7", "#ebb1d4"],
             begin=ft.Alignment(-1, -1),
@@ -190,32 +190,32 @@ def render_home(page, app_view, route):
     if mostrar_em_alta:
         main_scroll_controls.extend([
             ft.Container(
-                padding=ft.padding.only(left=20, bottom=5, top=25),
+                padding=ft.Padding(20, 25, 0, 5),
                 content=ft.Row([
                     ft.Icon(ft.Icons.LOCAL_FIRE_DEPARTMENT_ROUNDED, color="#818cf8", size=24),
                     ft.Text("Em Alta", size=20, weight="bold", color="on_surface")
                 ], spacing=8),
             ),
             ft.Container(
-                margin=ft.margin.only(left=10),
+                margin=ft.Margin(10, 0, 0, 0),
                 content=carrossel_row
             ),
         ])
 
     main_scroll_controls.extend([
         ft.Container(
-            padding=ft.padding.only(left=20, top=20, bottom=5),
+            padding=ft.Padding(20, 20, 0, 5),
             content=ft.Row([
                 ft.Icon(ft.Icons.EXPLORE_ROUNDED, color="#818cf8", size=24),
                 ft.Text("Explorar Todos", size=20, weight="bold", color="on_surface")
             ], spacing=8),
         ),
         ft.Container(
-            padding=ft.padding.only(left=10, right=10),
+            padding=ft.Padding(10, 0, 10, 0),
             content=lista_vertical
         ),
         ft.Container(
-            padding=ft.padding.symmetric(vertical=20),
+            padding=ft.Padding(0, 20, 0, 20),
             content=controles_paginacao
         ),
         ft.Container(height=100)

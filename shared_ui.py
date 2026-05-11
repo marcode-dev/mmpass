@@ -10,7 +10,7 @@ def get_bottom_bar(page, app_view, route):
         bgcolor="surface",
         blur=ft.Blur(20, 20),
         border=ft.border.only(top=ft.border.BorderSide(0.5, "outline_variant")),
-        padding=ft.padding.only(bottom=10),
+        padding=ft.Padding(0, 0, 0, 10),
         content=ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_AROUND,
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -167,7 +167,7 @@ def card_evento(evento, page, app_view, route, largura=250):
                                     ft.Text(f'{float(evento["preco"]):.2f}'.replace('.', ','), weight="bold", size=18, color="on_surface"),
                                 ], spacing=0),
                                 ft.Container(
-                                    padding=ft.padding.symmetric(horizontal=10, vertical=5),
+                                    padding=ft.Padding(10, 5, 10, 5),
                                     bgcolor="#f1f5f9",
                                     border_radius=8,
                                     content=ft.Text(

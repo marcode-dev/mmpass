@@ -113,7 +113,7 @@ def render_cupons(page, app_view, route):
                 desativado = False
 
         card = ft.Container(
-            padding=25, margin=ft.margin.symmetric(horizontal=20, vertical=10), 
+            padding=25, margin=ft.Margin(20, 10, 20, 10), 
             border_radius=25, bgcolor="surface",
             opacity=1 if liberado and not ja_usado else 0.6,
             shadow=ft.BoxShadow(blur_radius=15, color="black12", offset=ft.Offset(0,5)),
