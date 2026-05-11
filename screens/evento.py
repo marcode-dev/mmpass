@@ -145,7 +145,7 @@ def render_evento(page, app_view, route, evento):
                 ft.Container(
                     padding=20,
                     bgcolor="surface",
-                    border=ft.border.all(1, "outline_variant"),
+                    border=ft.Border.all(1, "outline_variant"),
                     border_radius=20,
                     content=ft.Column([
                         ft.Row([
@@ -189,7 +189,7 @@ def render_evento(page, app_view, route, evento):
                             padding=ft.Padding(12, 8, 12, 8),
                             bgcolor="#f8fafc",
                             border_radius=12,
-                            border=ft.border.all(1, "#e2e8f0"),
+                            border=ft.Border.all(1, "#e2e8f0"),
                             content=ft.Row([
                                 ft.Icon(ft.Icons.VERIFIED_USER_OUTLINED, size=16, color="#0f172a"),
                                 ft.Text("Segurança VIP", size=12, weight="w500", color="#0f172a")
@@ -199,7 +199,7 @@ def render_evento(page, app_view, route, evento):
                             padding=ft.Padding(12, 8, 12, 8),
                             bgcolor="#f8fafc",
                             border_radius=12,
-                            border=ft.border.all(1, "#e2e8f0"),
+                            border=ft.Border.all(1, "#e2e8f0"),
                             content=ft.Row([
                                 ft.Icon(ft.Icons.QR_CODE_2_ROUNDED, size=16, color="#0f172a"),
                                 ft.Text("Entrada Digital", size=12, weight="w500", color="#0f172a")
@@ -239,7 +239,7 @@ def render_evento(page, app_view, route, evento):
         padding=ft.Padding(25, 15, 25, 25),
         bgcolor=ft.Colors.with_opacity(0.9, "surface"),
         blur=ft.Blur(10, 10),
-        border=ft.border.only(top=ft.border.BorderSide(1, "outline_variant")),
+        border=ft.Border(top=ft.BorderSide(1, "outline_variant")),
         content=ft.Column([
             ft.Row([
                 ft.Column([

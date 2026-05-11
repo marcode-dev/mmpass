@@ -51,7 +51,7 @@ def render_cupons(page, app_view, route):
                             ft.Text("Copie o código e use no carrinho:", size=13, color="on_surface_variant", text_align="center"),
                         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
                         ft.Container(
-                            bgcolor="#F1F5F9", padding=15, border_radius=12, border=ft.border.all(1, "outline_variant"),
+                            bgcolor="#F1F5F9", padding=15, border_radius=12, border=ft.Border.all(1, "outline_variant"),
                             content=ft.Row([
                                 ft.Text(nome_cupom, size=24, weight="bold", color="#1E293B", expand=True, text_align="center"),
                             ], alignment=ft.MainAxisAlignment.CENTER)

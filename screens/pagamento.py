@@ -153,7 +153,7 @@ def render_pagamento(page, app_view, route):
                 padding=20,
                 bgcolor="white",
                 border_radius=25,
-                border=ft.border.all(1, "outline_variant"),
+                border=ft.Border.all(1, "outline_variant"),
                 shadow=ft.BoxShadow(blur_radius=20, color="black12"),
                 content=ft.Image(src=qr_pix, width=220, height=220)
             ),
@@ -227,7 +227,7 @@ def render_pagamento(page, app_view, route):
             icon_pix.color = "white"
             
             btn_card.bgcolor = "transparent"
-            btn_card.border = ft.border.all(1, "outline_variant")
+            btn_card.border = ft.Border.all(1, "outline_variant")
             text_card.color = "on_surface"
             icon_card.color = "#818cf8"
         else:
@@ -238,7 +238,7 @@ def render_pagamento(page, app_view, route):
             icon_card.color = "white"
             
             btn_pix.bgcolor = "transparent"
-            btn_pix.border = ft.border.all(1, "outline_variant")
+            btn_pix.border = ft.Border.all(1, "outline_variant")
             text_pix.color = "on_surface"
             icon_pix.color = "#818cf8"
         page.update()
@@ -255,7 +255,7 @@ def render_pagamento(page, app_view, route):
     icon_card = ft.Icon(ft.Icons.CREDIT_CARD_ROUNDED, color="#818cf8", size=24)
     text_card = ft.Text("Cartão", weight="bold", color="on_surface")
     btn_card = ft.Container(
-        expand=1, height=60, border=ft.border.all(1, "outline_variant"), border_radius=15,
+        expand=1, height=60, border=ft.Border.all(1, "outline_variant"), border_radius=15,
         on_click=lambda _: selecionar_metodo("cartao"),
         content=ft.Row([icon_card, text_card], alignment=ft.MainAxisAlignment.CENTER)
     )
@@ -299,7 +299,7 @@ def render_pagamento(page, app_view, route):
                                 padding=25,
                                 border_radius=25,
                                 bgcolor="surface",
-                                border=ft.border.all(1, "outline_variant"),
+                                border=ft.Border.all(1, "outline_variant"),
                                 content=ft.Column([
                                     ft.Row([
                                         ft.Text("Total da Compra", size=14, color="on_surface_variant"),

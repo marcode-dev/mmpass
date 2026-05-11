@@ -9,7 +9,7 @@ def get_bottom_bar(page, app_view, route):
         height=75,
         bgcolor="surface",
         blur=ft.Blur(20, 20),
-        border=ft.border.only(top=ft.border.BorderSide(0.5, "outline_variant")),
+        border=ft.Border(top=ft.BorderSide(0.5, "outline_variant")),
         padding=ft.Padding(0, 0, 0, 10),
         content=ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_AROUND,

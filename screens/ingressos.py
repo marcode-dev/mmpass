@@ -117,7 +117,7 @@ def render_ingressos(page, app_view, route):
                         padding=15,
                         bgcolor="white",
                         border_radius=20,
-                        border=ft.border.all(1, "outline_variant"),
+                        border=ft.Border.all(1, "outline_variant"),
                         shadow=ft.BoxShadow(blur_radius=15, color="black12"),
                         content=ft.Image(src=qr, width=220, height=220)
                     ),
@@ -161,7 +161,7 @@ def render_ingressos(page, app_view, route):
             padding=20, 
             border_radius=20,
             bgcolor="surface",
-            border=ft.border.all(1, "outline_variant"),
+            border=ft.Border.all(1, "outline_variant"),
             on_click=lambda e, i=ingresso: abrir_modal_ingresso(i),
             shadow=ft.BoxShadow(blur_radius=10, color="black12", offset=ft.Offset(0, 4)),
             content=ft.Row([
