@@ -135,7 +135,7 @@ def render_cupons(page, app_view, route):
                     ),
                     ft.Row([
                         ft.Container(
-                            padding=ft.padding.all(5),
+                            padding=5,
                             bgcolor=estilos_nivel.get(cupom['nivel'], estilos_nivel["Bronze"])["cores"][0] + "22", # 20% opacidade
                             border_radius=8,
                             content=ft.Row([

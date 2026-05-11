@@ -91,7 +91,7 @@ def card_evento(evento, page, app_view, route, largura=250):
 
     return ft.Container(
         width=largura, 
-        margin=ft.margin.all(10),
+        margin=10,
         padding=0, 
         border_radius=24,
         bgcolor="surface", 
@@ -126,10 +126,10 @@ def card_evento(evento, page, app_view, route, largura=250):
                         expand=True,
                     ),
                     ft.Container(
-                        padding=ft.padding.all(12),
+                        padding=12,
                         top=0, right=0,
                         content=ft.Container(
-                            padding=ft.padding.all(6),
+                            padding=6,
                             bgcolor="white24",
                             blur=10,
                             border_radius=12,
