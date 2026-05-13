@@ -5,7 +5,7 @@ Orquestra o registro atômico de compra: confere lotação, deduz cupons, adicio
 import flet as ft
 import requests
 from api import API_EVENTOS, API_INGRESSOS, HEADERS
-from utils import show_msg, gerar_qr, safe_storage_set
+from utils import show_msg, gerar_qr, safe_storage_set, gerar_token
 
 def render_pagamento(page, app_view, route):
     carrinho = getattr(page, 'carrinho', None) or []
@@ -88,11 +88,13 @@ def render_pagamento(page, app_view, route):
                 # 2. Registrar Ingresso
                 cupom_id = getattr(page, 'cupom_aplicado_id', None)
                 desconto_perc = getattr(page, 'desconto_porcentagem', 0)
+                token = gerar_token(12)
                 
                 novo_ingresso = {
                     "usuario_id": usuario_logado["id"],
                     "evento_id": evento["id"],
-                    "desconto": cupom_id # Agora armazena o ID do cupom
+                    "desconto": cupom_id, # Agora armazena o ID do cupom
+                    "codigo": token
                 }
                 resp_ing = requests.post(API_INGRESSOS, headers=HEADERS, json=novo_ingresso, timeout=10)
                 
@@ -151,7 +153,7 @@ def render_pagamento(page, app_view, route):
                 padding=20,
                 bgcolor="white",
                 border_radius=25,
-                border=ft.border.all(1, "outline_variant"),
+                border=ft.Border.all(1, "outline_variant"),
                 shadow=ft.BoxShadow(blur_radius=20, color="black12"),
                 content=ft.Image(src=qr_pix, width=220, height=220)
             ),
@@ -225,7 +227,7 @@ def render_pagamento(page, app_view, route):
             icon_pix.color = "white"
             
             btn_card.bgcolor = "transparent"
-            btn_card.border = ft.border.all(1, "outline_variant")
+            btn_card.border = ft.Border.all(1, "outline_variant")
             text_card.color = "on_surface"
             icon_card.color = "#818cf8"
         else:
@@ -236,7 +238,7 @@ def render_pagamento(page, app_view, route):
             icon_card.color = "white"
             
             btn_pix.bgcolor = "transparent"
-            btn_pix.border = ft.border.all(1, "outline_variant")
+            btn_pix.border = ft.Border.all(1, "outline_variant")
             text_pix.color = "on_surface"
             icon_pix.color = "#818cf8"
         page.update()
@@ -253,7 +255,7 @@ def render_pagamento(page, app_view, route):
     icon_card = ft.Icon(ft.Icons.CREDIT_CARD_ROUNDED, color="#818cf8", size=24)
     text_card = ft.Text("Cartão", weight="bold", color="on_surface")
     btn_card = ft.Container(
-        expand=1, height=60, border=ft.border.all(1, "outline_variant"), border_radius=15,
+        expand=1, height=60, border=ft.Border.all(1, "outline_variant"), border_radius=15,
         on_click=lambda _: selecionar_metodo("cartao"),
         content=ft.Row([icon_card, text_card], alignment=ft.MainAxisAlignment.CENTER)
     )
@@ -276,7 +278,7 @@ def render_pagamento(page, app_view, route):
             controls=[
                 # Top Header
                 ft.Container(
-                    padding=ft.padding.only(top=50, left=20, right=20, bottom=20),
+                    padding=ft.Padding(20, 50, 20, 20),
                     bgcolor="surface",
                     content=ft.Row([
                         ft.IconButton(ft.Icons.ARROW_BACK_IOS_NEW_ROUNDED, icon_size=20, on_click=lambda _: route(page, app_view, "carrinho")),
@@ -287,7 +289,7 @@ def render_pagamento(page, app_view, route):
                 # Conteúdo Principal
                 ft.Container(
                     expand=True,
-                    padding=ft.padding.only(left=25, right=25, top=10),
+                    padding=ft.Padding(25, 10, 25, 0),
                     content=ft.Column(
                         scroll=ft.ScrollMode.AUTO,
                         spacing=30,
@@ -297,7 +299,7 @@ def render_pagamento(page, app_view, route):
                                 padding=25,
                                 border_radius=25,
                                 bgcolor="surface",
-                                border=ft.border.all(1, "outline_variant"),
+                                border=ft.Border.all(1, "outline_variant"),
                                 content=ft.Column([
                                     ft.Row([
                                         ft.Text("Total da Compra", size=14, color="on_surface_variant"),
@@ -321,7 +323,7 @@ def render_pagamento(page, app_view, route):
                             
                             # Rodapé com Botão
                             ft.Container(
-                                padding=ft.padding.only(top=10, bottom=30),
+                                padding=ft.Padding(0, 10, 0, 30),
                                 content=btn_pagar
                             )
                         ]

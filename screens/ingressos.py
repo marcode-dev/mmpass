@@ -18,7 +18,7 @@ def render_ingressos(page, app_view, route):
 
     try:
         # Busca no Supabase puxando dados da tabela relacional "eventos" e o campo "desconto"
-        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id,data_compra,desconto,eventos(*)"
+        url = f"{API_INGRESSOS}?usuario_id=eq.{usuario_logado['id']}&select=id,data_compra,desconto,codigo,eventos(*)"
         response = requests.get(url, headers=HEADERS, timeout=10)
         
         if response.status_code == 200:
@@ -35,6 +35,7 @@ def render_ingressos(page, app_view, route):
 
                     ingressos.append({
                         "ingresso_id": item["id"],
+                        "codigo": item.get("codigo"),
                         "nome": ev["nome"],
                         "data": ev["data"],
                         "local": ev["local"],
@@ -65,7 +66,7 @@ def render_ingressos(page, app_view, route):
     ingressos.sort(key=lambda x: parse_date(x['data']))
 
     def abrir_modal_ingresso(ingresso):
-        qr = gerar_qr(f"ingresso-{ingresso['ingresso_id']}")
+        qr = gerar_qr(ingresso['codigo'])
         
         def fechar_dialog(e):
             modal.open = False
@@ -89,7 +90,7 @@ def render_ingressos(page, app_view, route):
                         ft.Row([
                             ft.Container(
                                 visible=bool(ingresso.get("desconto_perc")),
-                                padding=ft.padding.symmetric(horizontal=8, vertical=4),
+                                padding=ft.Padding(8, 4, 8, 4),
                                 bgcolor="green50",
                                 border_radius=8,
                                 content=ft.Text(f"Desconto aplicado: {ingresso.get('desconto_perc')}%", size=11, color="green700", weight="bold")
@@ -116,7 +117,7 @@ def render_ingressos(page, app_view, route):
                         padding=15,
                         bgcolor="white",
                         border_radius=20,
-                        border=ft.border.all(1, "outline_variant"),
+                        border=ft.Border.all(1, "outline_variant"),
                         shadow=ft.BoxShadow(blur_radius=15, color="black12"),
                         content=ft.Image(src=qr, width=220, height=220)
                     ),
@@ -149,18 +150,18 @@ def render_ingressos(page, app_view, route):
         lista_cards.append(
             ft.Container(
                 content=ft.Text("Você ainda não possui ingressos.", size=18, color="on_surface_variant"),
-                margin=ft.margin.only(top=50),
+                margin=ft.Margin(0, 50, 0, 0),
                 alignment=ft.Alignment(0, 0) 
             )
         )
 
     for ingresso in ingressos:
         card = ft.Container(
-            margin=ft.margin.symmetric(horizontal=20, vertical=8),
+            margin=ft.Margin(20, 8, 20, 8),
             padding=20, 
             border_radius=20,
             bgcolor="surface",
-            border=ft.border.all(1, "outline_variant"),
+            border=ft.Border.all(1, "outline_variant"),
             on_click=lambda e, i=ingresso: abrir_modal_ingresso(i),
             shadow=ft.BoxShadow(blur_radius=10, color="black12", offset=ft.Offset(0, 4)),
             content=ft.Row([
@@ -183,7 +184,7 @@ def render_ingressos(page, app_view, route):
                         ft.Text(f"{ingresso['data']}", size=12, color="on_surface_variant"),
                         ft.Container(
                             visible=bool(ingresso.get("desconto_perc")),
-                            padding=ft.padding.symmetric(horizontal=6, vertical=2),
+                            padding=ft.Padding(6, 2, 6, 2),
                             bgcolor="green50",
                             border_radius=5,
                             content=ft.Text(f"-{ingresso.get('desconto_perc')}%", size=10, color="green700", weight="bold")

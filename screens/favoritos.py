@@ -24,7 +24,7 @@ def render_favoritos(page, app_view, route):
 
     # Header Top
     header = ft.Container(
-        padding=ft.padding.only(top=35, left=20, right=20, bottom=15),
+        padding=ft.Padding(20, 35, 20, 15),
         bgcolor="surface",
         content=ft.Row([
             ft.IconButton(ft.Icons.ARROW_BACK_IOS_NEW_ROUNDED, icon_size=20, on_click=lambda _: route(page, app_view, "perfil")),
@@ -67,7 +67,7 @@ def render_favoritos(page, app_view, route):
                 header,
                 ft.Container(
                     expand=True,
-                    padding=ft.padding.only(left=10, right=10),
+                    padding=ft.Padding(10, 0, 10, 0),
                     content=conteudo_lista
                 ),
                 bottom_bar

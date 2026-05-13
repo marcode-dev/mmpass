@@ -145,7 +145,7 @@ def render_carrinho(page, app_view, route):
     for evento in carrinho:
         card = ft.Container(
             padding=10,
-            margin=ft.margin.symmetric(horizontal=15, vertical=5),
+            margin=ft.Margin(15, 5, 15, 5),
             border_radius=15,
             bgcolor="surface",
             shadow=ft.BoxShadow(blur_radius=10, color="black12", offset=ft.Offset(0, 2)),

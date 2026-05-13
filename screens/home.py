@@ -68,15 +68,18 @@ def render_home(page, app_view, route):
 
     # --- Lógica de Paginação ---
     itens_por_pág = 10
-    total_pags = (len(eventos_todos) + itens_por_pág - 1) // itens_por_pág
     
+    # Estado local da página e dados filtrados
+    state = {
+        "atual": 1,
+        "eventos_fonte": eventos_todos, # Lista que será paginada (todos ou filtrados)
+        "total_pags": (len(eventos_todos) + itens_por_pág - 1) // itens_por_pág
+    }
+
     def get_eventos_pagina(pagina):
         inicio = (pagina - 1) * itens_por_pág
         fim = inicio + itens_por_pág
-        return eventos_todos[inicio:fim]
-
-    # Estado local da página (inicia na 1)
-    page_state = {"atual": 1}
+        return state["eventos_fonte"][inicio:fim]
 
     lista_vertical = ft.Column(
         scroll=ft.ScrollMode.AUTO,
@@ -85,14 +88,28 @@ def render_home(page, app_view, route):
     )
 
     def atualizar_lista(pagina):
-        page_state["atual"] = pagina
+        state["atual"] = pagina
+        # Recalcula total de páginas baseado na fonte atual
+        state["total_pags"] = (len(state["eventos_fonte"]) + itens_por_pág - 1) // itens_por_pág
+        if state["total_pags"] == 0: state["total_pags"] = 1
+        
         evs = get_eventos_pagina(pagina)
         lista_vertical.controls = [card_evento(e, page, app_view, route, largura=None) for e in evs]
         
+        # Se não houver eventos na busca
+        if not evs and len(state["eventos_fonte"]) == 0:
+            lista_vertical.controls = [
+                ft.Container(
+                    padding=30,
+                    content=ft.Text("Nenhum evento encontrado com esse nome... 🔍", color="on_surface_variant")
+                )
+            ]
+
         # Atualiza controles de paginação
-        btn_prev.disabled = (pagina == 1)
-        btn_next.disabled = (pagina >= total_pags)
-        txt_pag.value = f"Página {pagina} de {total_pags}"
+        btn_prev.disabled = (pagina <= 1)
+        btn_next.disabled = (pagina >= state["total_pags"])
+        txt_pag.value = f"Página {pagina} de {state['total_pags']}"
+        controles_paginacao.visible = (state["total_pags"] > 1)
         
         page.update()
 
@@ -100,51 +117,45 @@ def render_home(page, app_view, route):
     btn_prev = ft.IconButton(
         ft.Icons.ARROW_BACK_IOS_NEW_ROUNDED, 
         disabled=True, 
-        on_click=lambda _: atualizar_lista(page_state["atual"] - 1),
+        on_click=lambda _: atualizar_lista(state["atual"] - 1),
         icon_size=18, icon_color="#818cf8"
     )
     btn_next = ft.IconButton(
         ft.Icons.ARROW_FORWARD_IOS_ROUNDED, 
-        disabled=(total_pags <= 1), 
-        on_click=lambda _: atualizar_lista(page_state["atual"] + 1),
+        disabled=(state["total_pags"] <= 1), 
+        on_click=lambda _: atualizar_lista(state["atual"] + 1),
         icon_size=18, icon_color="#818cf8"
     )
-    txt_pag = ft.Text(f"Página 1 de {total_pags}", size=14, weight="w500", color="on_surface_variant")
+    txt_pag = ft.Text(f"Página 1 de {state['total_pags']}", size=14, weight="w500", color="on_surface_variant")
 
     controles_paginacao = ft.Row([
         btn_prev,
         txt_pag,
         btn_next
-    ], alignment=ft.MainAxisAlignment.CENTER, spacing=20) if total_pags > 1 else ft.Container()
+    ], alignment=ft.MainAxisAlignment.CENTER, spacing=20, visible=(state["total_pags"] > 1))
 
     # Inicializa primeira página
     atualizar_lista(1)
 
     def filtrar_eventos(texto):
-        texto = texto.lower()
+        texto = texto.lower().strip()
+        is_searching = len(texto) > 0
         
-        # Filtrar Carrossel
-        carrossel_row.controls = [
-            card_evento(e, page, app_view, route, largura=280) 
-            for e in eventos_todos if texto in e["nome"].lower()
-        ]
+        # Define a fonte de dados
+        if is_searching:
+            state["eventos_fonte"] = [e for e in eventos_todos if texto in e["nome"].lower()]
+        else:
+            state["eventos_fonte"] = eventos_todos
         
-        # Filtrar Lista Vertical
-        lista_vertical.controls = [
-            card_evento(e, page, app_view, route, largura=None) 
-            for e in eventos_todos if texto in e["nome"].lower()
-        ]
+        # Gerencia visibilidade das seções
+        if mostrar_em_alta:
+            container_em_alta.visible = not is_searching
         
-        # Mensagem se nada for encontrado
-        if not lista_vertical.controls:
-            lista_vertical.controls = [
-                ft.Container(
-                    padding=30,
-                    content=ft.Text("Nenhum evento encontrado com esse nome... 🔍", color="on_surface_variant")
-                )
-            ]
-            
-        page.update()
+        container_explorar_titulo.visible = not is_searching
+        
+        # Reseta para a página 1 e atualiza a lista
+        atualizar_lista(1)
+
 
     campo_busca = ft.TextField(
         hint_text="Encontre sua próxima experiência...",
@@ -160,7 +171,7 @@ def render_home(page, app_view, route):
     )
 
     header = ft.Container(
-        padding=ft.padding.only(top=20, left=15, right=15, bottom=10),
+        padding=ft.Padding(15, 20, 15, 10),
         gradient=ft.LinearGradient(
             colors=["#87e4e7", "#ebb1d4"],
             begin=ft.Alignment(-1, -1),
@@ -187,35 +198,39 @@ def render_home(page, app_view, route):
 
     # Montar controles do scroll dinamicamente
     main_scroll_controls = [header]
-    if mostrar_em_alta:
-        main_scroll_controls.extend([
-            ft.Container(
-                padding=ft.padding.only(left=20, bottom=5, top=25),
-                content=ft.Row([
-                    ft.Icon(ft.Icons.LOCAL_FIRE_DEPARTMENT_ROUNDED, color="#818cf8", size=24),
-                    ft.Text("Em Alta", size=20, weight="bold", color="on_surface")
-                ], spacing=8),
-            ),
-            ft.Container(
-                margin=ft.margin.only(left=10),
-                content=carrossel_row
-            ),
-        ])
-
-    main_scroll_controls.extend([
+    
+    container_em_alta = ft.Column([
         ft.Container(
-            padding=ft.padding.only(left=20, top=20, bottom=5),
+            padding=ft.Padding(20, 25, 0, 5),
             content=ft.Row([
-                ft.Icon(ft.Icons.EXPLORE_ROUNDED, color="#818cf8", size=24),
-                ft.Text("Explorar Todos", size=20, weight="bold", color="on_surface")
+                ft.Icon(ft.Icons.LOCAL_FIRE_DEPARTMENT_ROUNDED, color="#818cf8", size=24),
+                ft.Text("Em Alta", size=20, weight="bold", color="on_surface")
             ], spacing=8),
         ),
         ft.Container(
-            padding=ft.padding.only(left=10, right=10),
+            margin=ft.Margin(10, 0, 0, 0),
+            content=carrossel_row
+        ),
+    ], visible=mostrar_em_alta)
+
+    container_explorar_titulo = ft.Container(
+        padding=ft.Padding(20, 20, 0, 5),
+        content=ft.Row([
+            ft.Icon(ft.Icons.EXPLORE_ROUNDED, color="#818cf8", size=24),
+            ft.Text("Explorar Todos", size=20, weight="bold", color="on_surface")
+        ], spacing=8),
+    )
+
+    main_scroll_controls.append(container_em_alta)
+    main_scroll_controls.extend([
+        container_explorar_titulo,
+        ft.Container(
+            padding=ft.Padding(10, 0, 10, 0),
             content=lista_vertical
         ),
+
         ft.Container(
-            padding=ft.padding.symmetric(vertical=20),
+            padding=ft.Padding(0, 20, 0, 20),
             content=controles_paginacao
         ),
         ft.Container(height=100)
