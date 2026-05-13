@@ -4,7 +4,7 @@ Gerencia credenciais, cabeçalhos de autenticação e rotas de tabelas para o ba
 """
 
 SUPABASE_URL = "https://dszzjdzferfxnbfthdmi.supabase.co"
-SUPABASE_KEY = "sb_publishable_jwwZUJDs1NJ6niWj-cRhig_w1MWmgfa"
+SUPABASE_KEY = "sb_publishable_7pYO1wdMS0oveUoVaLqNcA_a6NONxcZ"
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
